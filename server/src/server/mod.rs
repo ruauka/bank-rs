@@ -54,7 +54,7 @@ async fn shutdown_signal() {
     };
     // отслеживание всех сигналов завершения
     tokio::select! {
-        _ = ctrl_c => {println!("\nShutting down server1...")},
-        _ = terminate => {println!("\nShutting down server1...")},
+        _ = ctrl_c => {println!("\nShutting down server...")},
+        _ = terminate => {println!("\nShutting down server...")},
     }
 }
