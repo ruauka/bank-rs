@@ -1,6 +1,6 @@
 use crate::adapters::storage::storage::AccountStorage;
 use crate::adapters::storage::{StorageState, Storages};
-use crate::domain::entities::account::Account;
+use crate::domain::entities::account::{Account, BalanceResponse};
 use crate::domain::entities::transaction::Operation::{
     Replenish, TransferDecrease, TransferIncrease, Withdraw,
 };
@@ -38,7 +38,7 @@ pub fn new_account<S: Storages>(storage: Arc<RwLock<S>>) -> TransactionResponse 
     // добавление счета в db
     storage.write().unwrap().db().create_account(account);
     // body
-    let tr: TransactionResponse = TransactionResponse::new(Some(acc_name), Some(0_u32), None);
+    let tr: TransactionResponse = TransactionResponse::new(acc_name, 0_u32, 0_f64);
     // backup
     storage.write().unwrap().db().backup_store();
 
@@ -94,7 +94,7 @@ pub fn change_acc_balance<S: Storages>(
     cur_acc.balance = new_balance;
     // body
     let tr: TransactionResponse =
-        TransactionResponse::new(Some(account_name.to_string()), Some(new_trans_id), None);
+        TransactionResponse::new(account_name.to_string(), new_trans_id, cur_acc.balance);
     // backup
     binding.db().backup_store();
 
@@ -156,7 +156,7 @@ pub fn transfer<S: Storages>(
 pub fn get_balance<S: Storages>(
     storage: Arc<RwLock<S>>,
     account_name: String,
-) -> Result<TransactionResponse, AppError> {
+) -> Result<BalanceResponse, AppError> {
     // проверка наличия счета
     if !storage.write().unwrap().db().check_key(&account_name) {
         return Err(AccountExistsErr(account_name));
@@ -165,8 +165,7 @@ pub fn get_balance<S: Storages>(
     // получение счета
     let account: &Account = binding.db().get_account(&account_name);
     // body
-    let tr: TransactionResponse =
-        TransactionResponse::new(Some(account_name), None, Some(account.balance));
+    let balance: BalanceResponse = BalanceResponse::new(account.balance);
 
-    Ok(tr)
+    Ok(balance)
 }

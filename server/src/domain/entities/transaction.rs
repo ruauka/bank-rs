@@ -52,21 +52,14 @@ pub struct TransactionRequest {
 /// Структура ответа совершенной транзакции.
 #[derive(Serialize, ToSchema)]
 pub struct TransactionResponse {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub account_name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub transaction_id: Option<u32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub balance: Option<f64>,
+    pub account_name: String,
+    pub transaction_id: u32,
+    pub balance: f64,
 }
 
 impl TransactionResponse {
     /// Конструктор ответа совершенной транзакции.
-    pub fn new(
-        account_name: Option<String>,
-        transaction_id: Option<u32>,
-        balance: Option<f64>,
-    ) -> Self {
+    pub fn new(account_name: String, transaction_id: u32, balance: f64) -> Self {
         Self {
             account_name,
             transaction_id,

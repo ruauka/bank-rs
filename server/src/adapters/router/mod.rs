@@ -17,7 +17,7 @@ use crate::adapters::router::handlers::storage::{backup_execute, get_all_transac
 use crate::adapters::router::handlers::transaction::transaction;
 use crate::adapters::storage::storage::AccountStorageImpl;
 use crate::adapters::storage::Storage;
-use crate::domain::entities::account::{Account, Status};
+use crate::domain::entities::account::{Account, BalanceResponse, Status};
 use crate::domain::entities::transaction::{
     Operation, Transaction, TransactionRequest, TransactionResponse,
 };
@@ -44,7 +44,7 @@ storage::get_all_transactions,
 storage::backup_execute
 ),
 components(
-schemas(Account, Status, TransactionResponse, Transaction, Operation,
+schemas(Account, Status, TransactionResponse, Transaction, Operation, BalanceResponse,
 TransactionRequest, AppError, TransferRequest, TransferResponse, Transaction)
 ),
 tags(

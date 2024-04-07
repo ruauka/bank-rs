@@ -1,5 +1,5 @@
 use crate::adapters::storage::{Storage, StorageState};
-use crate::domain::entities::account::Account;
+use crate::domain::entities::account::{Account, BalanceResponse};
 use crate::domain::entities::transaction::{
     Operation,
     Operation::{Replenish, TransferDecrease, TransferIncrease, Withdraw},
@@ -137,7 +137,7 @@ params(
 ("account" = String, Path, description = "account name")
 ),
 responses(
-(status = 200, description = "Got balance successfully", body = TransactionResponse),
+(status = 200, description = "Got balance successfully", body = BalanceResponse),
 (status = 400, description = "Empty db error", body = AppError, example = json ! (
 {"error": AccountExistsErr(String::from("account_№n")).to_string()}))
 )
@@ -146,14 +146,14 @@ responses(
 pub async fn get_balance(
     State(state): State<StorageState>,
     Path(account_name): Path<String>,
-) -> Result<Json<TransactionResponse>> {
+) -> Result<Json<BalanceResponse>> {
     // Баланса счета
-    let tr: TransactionResponse = match usecases::account::get_balance(state, account_name) {
+    let balance: BalanceResponse = match usecases::account::get_balance(state, account_name) {
         Ok(res) => res,
         Err(err) => {
             return Err(err);
         }
     };
     // 200
-    Ok(Json(tr))
+    Ok(Json(balance))
 }

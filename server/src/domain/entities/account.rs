@@ -42,3 +42,16 @@ impl Account {
         acc
     }
 }
+
+/// Структура ответа баланса счета.
+#[derive(Serialize, ToSchema)]
+pub struct BalanceResponse {
+    pub balance: f64,
+}
+
+impl BalanceResponse {
+    /// Конструктор ответа баланса счета.
+    pub fn new(balance: f64) -> Self {
+        Self { balance }
+    }
+}
