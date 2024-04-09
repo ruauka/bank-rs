@@ -27,9 +27,9 @@ responses(
 /// Имя счетов формируются автоматически. Имя первого счета: account_1.
 pub async fn new_account(State(state): State<StorageState>) -> Result<Json<TransactionResponse>> {
     // новый счета
-    let tr: TransactionResponse = usecases::account::new_account(state);
+    let tx: TransactionResponse = usecases::account::new_account(state);
     // 201
-    Ok(Json(tr))
+    Ok(Json(tx))
 }
 
 #[utoipa::path(
@@ -54,7 +54,7 @@ pub async fn replenish(
     Json(payload): Json<TransactionRequest>,
 ) -> Result<Json<TransactionResponse>> {
     // пополнение счета
-    let tr: TransactionResponse = match usecases::account::change_acc_balance(
+    let tx: TransactionResponse = match usecases::account::change_acc_balance(
         &state,
         payload.transaction_value.unwrap(),
         &payload.account_name,
@@ -66,7 +66,7 @@ pub async fn replenish(
         }
     };
     // 200
-    Ok(Json(tr))
+    Ok(Json(tx))
 }
 
 #[utoipa::path(
@@ -91,7 +91,7 @@ pub async fn withdraw(
     Json(payload): Json<TransactionRequest>,
 ) -> Result<Json<TransactionResponse>> {
     // списание со счета
-    let tr: TransactionResponse = match usecases::account::change_acc_balance(
+    let tx: TransactionResponse = match usecases::account::change_acc_balance(
         &state,
         payload.transaction_value.unwrap(),
         &payload.account_name,
@@ -103,7 +103,7 @@ pub async fn withdraw(
         }
     };
     // 200
-    Ok(Json(tr))
+    Ok(Json(tx))
 }
 
 #[utoipa::path(
@@ -129,14 +129,14 @@ pub async fn transfer(
     Json(payload): Json<TransferRequest>,
 ) -> Result<Json<TransferResponse>> {
     // Перевод со счета на счет
-    let tr: TransferResponse = match usecases::account::transfer(state, payload) {
+    let tx: TransferResponse = match usecases::account::transfer(state, payload) {
         Ok(res) => res,
         Err(err) => {
             return Err(err);
         }
     };
     // 200
-    Ok(Json(tr))
+    Ok(Json(tx))
 }
 
 #[utoipa::path(

@@ -30,12 +30,12 @@ pub async fn transaction(
     Path((account_name, transaction_id)): Path<(String, u32)>,
 ) -> Result<Json<Transaction>> {
     // получение транзакции по id
-    let tr = match usecases::transaction::transaction(state, account_name, transaction_id) {
+    let tx: Transaction = match usecases::transaction::transaction(state, account_name, transaction_id) {
         Ok(res) => res,
         Err(err) => {
             return Err(err);
         }
     };
     // 200
-    Ok(Json(tr))
+    Ok(Json(tx))
 }

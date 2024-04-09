@@ -21,12 +21,12 @@ pub fn transaction<S: Storages>(
     // получение счета
     let account: &Account = binding.db().get_account(&account_name);
     // текущая транзакция
-    let Some(tr) = account.transactions.get(transaction_id as usize) else {
+    let Some(tx) = account.transactions.get(transaction_id as usize) else {
         return Err(TransactionExistsErr(
             account_name.to_string(),
             transaction_id.to_string(),
         ));
     };
 
-    Ok(tr.clone())
+    Ok(tx.clone())
 }

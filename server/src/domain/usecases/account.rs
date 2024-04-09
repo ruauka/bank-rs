@@ -26,7 +26,7 @@ pub fn new_account<S: Storages>(storage: Arc<RwLock<S>>) -> TransactionResponse 
     let acc_name: String = account.name.clone();
 
     // создание транзакиции о создании счета
-    let trans: Transaction = Transaction::new(
+    let tx_new: Transaction = Transaction::new(
         0_u32,
         Operation::Registration.to_string().to_lowercase(),
         f64::default(),
@@ -34,15 +34,15 @@ pub fn new_account<S: Storages>(storage: Arc<RwLock<S>>) -> TransactionResponse 
         f64::default(),
     );
     // добавление транзакции в список транзакций счета
-    account.transactions.push(trans);
+    account.transactions.push(tx_new);
     // добавление счета в db
     storage.write().unwrap().db().create_account(account);
     // body
-    let tr: TransactionResponse = TransactionResponse::new(acc_name, 0_u32, 0_f64);
+    let tx: TransactionResponse = TransactionResponse::new(acc_name, 0_u32, 0_f64);
     // backup
     storage.write().unwrap().db().backup_store();
 
-    tr
+    tx
 }
 
 /// Изменение баланса счета.
@@ -68,37 +68,37 @@ pub fn change_acc_balance<S: Storages>(
     if (operation == Withdraw || operation == TransferDecrease) && cur_acc.balance < trans_value {
         return Err(OverdraftErr);
     }
-    // id последней транзакции
-    let last_tr_idx: u32 = (cur_acc.transactions.len() - 1) as u32;
+    // id последней транзакции (совпадает с индексом)
+    let last_tx_id: u32 = (cur_acc.transactions.len() - 1) as u32;
     // id новой транзакции
-    let new_trans_id: u32 = last_tr_idx + 1;
+    let new_tx_id: u32 = last_tx_id + 1;
     // новый баланс счета
     let new_balance: f64 = if operation == Replenish || operation == TransferIncrease {
         // пополнение счета
-        cur_acc.transactions[last_tr_idx as usize].current + trans_value
+        cur_acc.transactions[last_tx_id as usize].current + trans_value
     } else {
         // списание со счета
-        cur_acc.transactions[last_tr_idx as usize].current - trans_value
+        cur_acc.transactions[last_tx_id as usize].current - trans_value
     };
     // создание новой транзакции
-    let trans: Transaction = Transaction::new(
-        new_trans_id,
+    let tx_new: Transaction = Transaction::new(
+        new_tx_id,
         operation.to_string().to_lowercase(),
-        cur_acc.transactions[last_tr_idx as usize].current,
+        cur_acc.transactions[last_tx_id as usize].current,
         trans_value,
         new_balance,
     );
     // добавление транзакции в бд
-    cur_acc.transactions.push(trans);
+    cur_acc.transactions.push(tx_new);
     // обновление текущего баланса счета
     cur_acc.balance = new_balance;
     // body
-    let tr: TransactionResponse =
-        TransactionResponse::new(account_name.to_string(), new_trans_id, cur_acc.balance);
+    let tx: TransactionResponse =
+        TransactionResponse::new(account_name.to_string(), new_tx_id, cur_acc.balance);
     // backup
     binding.db().backup_store();
 
-    Ok(tr)
+    Ok(tx)
 }
 
 /// Перевод со счета на счет.
@@ -107,9 +107,9 @@ pub fn transfer<S: Storages>(
     payload: TransferRequest,
 ) -> Result<TransferResponse, AppError> {
     let p = payload.clone();
-    let trans_value: f64 = payload.transfer_value;
+    let tx_value: f64 = payload.transfer_value;
     // проверка на наличие изменение баланса на 0 или меньше
-    if trans_value <= 0_f64 {
+    if tx_value <= 0_f64 {
         return Err(ZeroValueTransactionErr);
     }
     // проверка на перевод самому себе
@@ -132,7 +132,7 @@ pub fn transfer<S: Storages>(
     // списание со счета отправителя
     if let Err(err) = change_acc_balance(
         &storage,
-        trans_value,
+        tx_value,
         &payload.account_from,
         TransferDecrease,
     ) {
@@ -140,16 +140,16 @@ pub fn transfer<S: Storages>(
     }
     // пополнение счета получателя
     if let Err(err) =
-        change_acc_balance(&storage, trans_value, &payload.account_to, TransferIncrease)
+        change_acc_balance(&storage, tx_value, &payload.account_to, TransferIncrease)
     {
         return Err(err);
     }
     // body
-    let tr: TransferResponse = TransferResponse::new(p);
+    let tx: TransferResponse = TransferResponse::new(p);
     // backup
     storage.write().unwrap().db().backup_store();
 
-    Ok(tr)
+    Ok(tx)
 }
 
 /// Баланса счета.
