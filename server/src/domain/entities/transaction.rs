@@ -87,7 +87,7 @@ impl TransferResponse {
     /// Конструктор ответа успешного перевода.
     pub fn new(details: TransferRequest) -> Self {
         Self {
-            info: "successfully transfer".to_string(),
+            info: "successfully transfered".to_string(),
             details,
         }
     }

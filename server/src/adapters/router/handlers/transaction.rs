@@ -18,7 +18,7 @@ params(
 ),
 responses(
 (status = 200, description = "Got transaction successfully", body = [Transaction]),
-(status = 400, description = "Errors", body = AppError, example = json ! (
+(status = 404, description = "Errors", body = AppError, example = json ! (
 [
 {"error1": AccountExistsErr(String::from("account_№n")).to_string()},
 {"error2": TransactionExistsErr(String::from("account №n"), String::from("transaction №n")).to_string()},

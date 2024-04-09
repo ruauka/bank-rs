@@ -9,7 +9,7 @@ use std::fs;
 use std::sync::{Arc, RwLock};
 
 /// Путь к backup.json для бэкапа db.
-pub const PATH: &str = "src/backup";
+pub const PATH: &str = "backup";
 
 /// Структура db (in-memory).
 #[derive(Debug, Default)]

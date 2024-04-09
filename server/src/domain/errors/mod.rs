@@ -14,8 +14,11 @@ pub type Result<T, E = AppError> = core::result::Result<T, E>;
 pub enum AppError {
     // #[schema(example = "Some error from enum 'Errors'")]
     // счет не существует
-    #[error("account with name: '{0}' not exists")]
+    #[error("account with name: '{0}' not found")]
     AccountExistsErr(String),
+    // транзакция не существует
+    #[error("account: '{0}' has no transaction with id: '{1}'")]
+    TransactionExistsErr(String, String),
     // транзакция со значением 0
     #[error("forbid transaction with 0 or less")]
     ZeroValueTransactionErr,
@@ -25,9 +28,6 @@ pub enum AppError {
     // транзакция самому себе
     #[error("forbid transaction to yourself")]
     SelfTransactionErr,
-    // транзакция не существует
-    #[error("account: '{0}' has no transaction with id: '{1}'")]
-    TransactionExistsErr(String, String),
     // транзакция не существует
     #[error("empty database")]
     EmptyDbErr,
@@ -43,13 +43,14 @@ pub enum AppError {
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         let (status, err_msg) = match self {
-            AppError::AccountExistsErr(_) => (StatusCode::BAD_REQUEST, self.to_string()),
-            AppError::ZeroValueTransactionErr => (StatusCode::BAD_REQUEST, self.to_string()),
-            AppError::OverdraftErr => (StatusCode::BAD_REQUEST, self.to_string()),
-            AppError::SelfTransactionErr => (StatusCode::BAD_REQUEST, self.to_string()),
-            AppError::TransactionExistsErr(_, _) => (StatusCode::BAD_REQUEST, self.to_string()),
-            AppError::EmptyDbErr => (StatusCode::BAD_REQUEST, self.to_string()),
-            AppError::BackupLoadFileErr => (StatusCode::BAD_REQUEST, self.to_string()),
+            AppError::AccountExistsErr(_) | AppError::TransactionExistsErr(_, _) => {
+                (StatusCode::NOT_FOUND, self.to_string())
+            }
+            AppError::ZeroValueTransactionErr
+            | AppError::OverdraftErr
+            | AppError::SelfTransactionErr
+            | AppError::EmptyDbErr
+            | AppError::BackupLoadFileErr => (StatusCode::BAD_REQUEST, self.to_string()),
             // AppError::Other(_) => (StatusCode::INTERNAL_SERVER_ERROR, self.to_string()),
         };
         let body = Json(json!({

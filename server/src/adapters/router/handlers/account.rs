@@ -38,13 +38,16 @@ path = "/replenish",
 request_body = TransactionRequest,
 responses(
 (status = 200, description = "Account replenished successfully", body = TransactionResponse),
-(status = 400, description = "Errors", body = AppError, example = json ! (
+(status = 400, description = "Errors", body = AppError, example = json!(
 [
-{"error1": AccountExistsErr(String::from("account_№n")).to_string()},
-{"error2": ZeroValueTransactionErr.to_string()},
-{"error3": OverdraftErr.to_string()}
+{"error1": ZeroValueTransactionErr.to_string()},
+{"error2": OverdraftErr.to_string()}
 ]
-))))]
+)),
+(status = 404, description = "Account not found", body = AppError, example = json!(
+{"error": AccountExistsErr(String::from("account_№n")).to_string()}
+)),
+))]
 /// Пополнение счета
 pub async fn replenish(
     State(state): State<StorageState>,
@@ -74,11 +77,14 @@ responses(
 (status = 200, description = "Account withdrawed successfully", body = TransactionResponse),
 (status = 400, description = "Errors", body = AppError, example = json ! (
 [
-{"error1": AccountExistsErr(String::from("account_№n")).to_string()},
-{"error2": ZeroValueTransactionErr.to_string()},
-{"error3": OverdraftErr.to_string()}
+{"error1": ZeroValueTransactionErr.to_string()},
+{"error2": OverdraftErr.to_string()}
 ]
-))))]
+)),
+(status = 404, description = "Account not found", body = AppError, example = json!(
+{"error": AccountExistsErr(String::from("account_№n")).to_string()}
+)),
+))]
 /// Списание со счета
 pub async fn withdraw(
     State(state): State<StorageState>,
@@ -110,10 +116,13 @@ responses(
 [
 {"error1": ZeroValueTransactionErr.to_string()},
 {"error2": SelfTransactionErr.to_string()},
-{"error3": AccountExistsErr(String::from("account_№n")).to_string()},
-{"error4": OverdraftErr.to_string()}
+{"error3": OverdraftErr.to_string()}
 ]
-))))]
+)),
+(status = 404, description = "Account not found", body = AppError, example = json!(
+{"error": AccountExistsErr(String::from("account_№n")).to_string()}
+)),
+))]
 /// Перевод со счета на счет
 pub async fn transfer(
     State(state): State<StorageState>,
@@ -138,10 +147,9 @@ params(
 ),
 responses(
 (status = 200, description = "Got balance successfully", body = BalanceResponse),
-(status = 400, description = "Empty db error", body = AppError, example = json ! (
-{"error": AccountExistsErr(String::from("account_№n")).to_string()}))
-)
-)]
+(status = 404, description = "Account not found", body = AppError, example = json!(
+{"error": AccountExistsErr(String::from("account_№n")).to_string()})),
+))]
 /// Баланса счета
 pub async fn get_balance(
     State(state): State<StorageState>,
