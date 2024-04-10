@@ -13,7 +13,9 @@ use std::time::Duration;
 use crate::adapters::router::handlers::account::{
     get_balance, new_account, replenish, transfer, withdraw,
 };
-use crate::adapters::router::handlers::storage::{backup_execute, get_all_transactions};
+use crate::adapters::router::handlers::storage::{
+    backup_execute, get_account_transactions, get_all_transactions,
+};
 use crate::adapters::router::handlers::transaction::transaction;
 use crate::adapters::storage::storage::AccountStorageImpl;
 use crate::adapters::storage::Storage;
@@ -40,6 +42,7 @@ account::withdraw,
 account::transfer,
 account::get_balance,
 transaction::transaction,
+storage::get_account_transactions,
 storage::get_all_transactions,
 storage::backup_execute
 ),
@@ -94,6 +97,7 @@ pub fn transaction_registration(shared_state: &Arc<RwLock<Storage>>) -> Router {
 /// Регистрация хендлеров работы с БД.
 pub fn storage_registration(shared_state: &Arc<RwLock<Storage>>) -> Router {
     Router::new()
+        .route("/history/:account", get(get_account_transactions))
         .route("/history", get(get_all_transactions))
         .route("/backup", post(backup_execute))
         .with_state(Arc::clone(shared_state))

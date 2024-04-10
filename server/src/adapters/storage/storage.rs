@@ -61,7 +61,7 @@ impl AccountStorage for AccountStorageImpl {
         self.accounts.get_mut(acc_name).unwrap()
     }
 
-    /// Получение баланса счета.
+    /// Получение счета.
     fn get_account(&self, acc_name: &String) -> &Account {
         self.accounts.get(acc_name).unwrap()
     }

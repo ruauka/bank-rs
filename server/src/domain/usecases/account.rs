@@ -130,17 +130,13 @@ pub fn transfer<S: Storages>(
         return Err(AccountExistsErr(payload.account_to));
     }
     // списание со счета отправителя
-    if let Err(err) = change_acc_balance(
-        &storage,
-        tx_value,
-        &payload.account_from,
-        TransferDecrease,
-    ) {
+    if let Err(err) =
+        change_acc_balance(&storage, tx_value, &payload.account_from, TransferDecrease)
+    {
         return Err(err);
     }
     // пополнение счета получателя
-    if let Err(err) =
-        change_acc_balance(&storage, tx_value, &payload.account_to, TransferIncrease)
+    if let Err(err) = change_acc_balance(&storage, tx_value, &payload.account_to, TransferIncrease)
     {
         return Err(err);
     }

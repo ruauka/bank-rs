@@ -1,12 +1,39 @@
 use crate::adapters::storage::StorageState;
 use crate::domain::entities::account::Account;
-use crate::domain::errors::AppError::{BackupLoadFileErr, EmptyDbErr};
+use crate::domain::errors::AppError::{AccountExistsErr, BackupLoadFileErr, EmptyDbErr};
 use crate::domain::errors::Result;
 use crate::domain::usecases;
-use axum::extract::State;
+use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::Json;
 use std::collections::HashMap;
+
+#[utoipa::path(
+get,
+path = "/history/{account}",
+params(
+("account" = String, Path, description = "account name")
+),
+responses(
+(status = 200, description = "Got account successfully", body = Account),
+(status = 404, description = "Account not found", body = AppError, example = json!(
+{"error": AccountExistsErr(String::from("account_№n")).to_string()})),
+))]
+/// Получение всех транзакций счета
+pub async fn get_account_transactions(
+    State(state): State<StorageState>,
+    Path(account_name): Path<String>,
+) -> Result<Json<Account>> {
+    // получение счета
+    let acc: Account = match usecases::storage::get_account_transactions(state, account_name) {
+        Ok(res) => res,
+        Err(err) => {
+            return Err(err);
+        }
+    };
+    // 200
+    Ok(Json(acc))
+}
 
 #[utoipa::path(
 get,
