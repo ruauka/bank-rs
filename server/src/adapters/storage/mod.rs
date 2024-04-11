@@ -18,12 +18,14 @@ pub struct Storage {
 /// Трейт для слоя usecases.
 pub trait Storages {
     type AccountStorageImpl: AccountStorage;
+
     fn db(&mut self) -> &mut Self::AccountStorageImpl;
 }
 
 /// Имплементация Storages с &mut владением.
 impl Storages for Storage {
     type AccountStorageImpl = AccountStorageImpl;
+
     fn db(&mut self) -> &mut Self::AccountStorageImpl {
         &mut self.db
     }

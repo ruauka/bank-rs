@@ -1,8 +1,8 @@
 run-server:
-	cd server && cargo run
+	cargo run -p server
 
 fmt:
-	cd server && cargo fmt && cd .. && cd client && cargo fmt && cd .. && cd example && cargo fmt
+	cargo fmt
 
 doc:
 	cargo doc --open

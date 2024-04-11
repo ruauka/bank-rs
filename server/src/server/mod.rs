@@ -5,6 +5,7 @@ use axum::Router;
 use std::fs;
 use std::sync::{Arc, RwLock};
 use tokio::signal;
+use tracing::info;
 
 /// Хост и порт.
 const ADDRESS: &str = "127.0.0.1:8080";
@@ -24,7 +25,7 @@ pub async fn execute() {
         .init();
     // tcp-движок
     let listener = tokio::net::TcpListener::bind(ADDRESS).await.unwrap();
-    println!(
+    info!(
         "🚀 Server started successfully. Listening on {}...",
         listener.local_addr().unwrap()
     );
@@ -54,7 +55,7 @@ async fn shutdown_signal() {
     };
     // отслеживание всех сигналов завершения
     tokio::select! {
-        _ = ctrl_c => {println!("\nShutting down server...")},
-        _ = terminate => {println!("\nShutting down server...")},
+        _ = ctrl_c => { info!("Shutting down server...") },
+        _ = terminate => { info!("Shutting down server...") },
     }
 }

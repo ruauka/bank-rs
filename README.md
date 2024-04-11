@@ -123,9 +123,9 @@ Swagger is available at link - http://localhost:8080/swagger/
 
 ### Replication
 
-After starting the service, a local folder is created for replication along the `/backup` path.
+After starting the service, a local folder is created for replication along the `server/backup` path.
 
-After first successful transaction creates file `/backup/backup.json` and all successful transaction are replicated
+After first successful transaction creates file `server/backup/backup.json` and all successful transaction are replicated
 in it.
 
 Db replicates in file `after every successful transaction`.

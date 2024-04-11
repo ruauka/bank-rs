@@ -1,7 +1,6 @@
 use crate::domain::entities::account::Account;
 use crate::domain::errors::AppError;
 use crate::domain::errors::AppError::BackupLoadFileErr;
-use axum::async_trait;
 use serde::Serialize;
 use serde_json::json;
 use std::collections::HashMap;
@@ -9,7 +8,7 @@ use std::fs;
 use std::sync::{Arc, RwLock};
 
 /// Путь к backup.json для бэкапа db.
-pub const PATH: &str = "backup";
+pub const PATH: &str = "server/backup";
 
 /// Структура db (in-memory).
 #[derive(Debug, Default)]
@@ -18,9 +17,8 @@ pub struct AccountStorageImpl {
 }
 
 /// Трейт бд
-#[async_trait]
 pub trait AccountStorage {
-    fn get_last_account_name(&mut self) -> String;
+    fn get_last_account_name(&self) -> String;
     fn create_account(&mut self, account: Account);
     fn check_key(&mut self, acc_name: &String) -> bool;
     fn get_mut_account(&mut self, acc_name: &String) -> &mut Account;
@@ -33,8 +31,8 @@ pub trait AccountStorage {
 /// Имплементация трейта бд
 // #[async_trait]
 impl AccountStorage for AccountStorageImpl {
-    /// Получение названия последнего счета для инкремента и созданиея нового счета.
-    fn get_last_account_name(&mut self) -> String {
+    /// Получение названия последнего счета для инкремента и создания нового счета.
+    fn get_last_account_name(&self) -> String {
         // проверка на пустое db
         if self.accounts.is_empty() {
             return "".to_string();
