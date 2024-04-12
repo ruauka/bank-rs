@@ -177,7 +177,7 @@ responses(
 (status = 404, description = "Account not found", body = AppError, example = json!(
 {"error": AccountExistsErr(String::from("account_№n")).to_string()})),
 ))]
-/// Получение всех транзакций счета
+/// Получение счета
 pub async fn account(
     State(state): State<StorageState>,
     Path(account_name): Path<String>,
