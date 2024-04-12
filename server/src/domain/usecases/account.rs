@@ -149,7 +149,7 @@ pub fn transfer<S: Storages>(
 }
 
 /// Баланса счета.
-pub fn get_balance<S: Storages>(
+pub fn balance<S: Storages>(
     storage: Arc<RwLock<S>>,
     account_name: String,
 ) -> Result<BalanceResponse, AppError> {
@@ -164,4 +164,21 @@ pub fn get_balance<S: Storages>(
     let balance: BalanceResponse = BalanceResponse::new(account.balance);
 
     Ok(balance)
+}
+
+/// Получение всех транзакций счета.
+pub fn account<S: Storages>(
+    storage: Arc<RwLock<S>>,
+    account_name: String,
+) -> Result<Account, AppError> {
+    // проверка наличия счета
+    if !storage.write().unwrap().db().check_key(&account_name) {
+        return Err(AccountExistsErr(account_name.to_string()));
+    }
+
+    let mut binding = storage.write().unwrap();
+    // получение счета
+    let account: &Account = binding.db().get_account(&account_name);
+
+    Ok(account.clone())
 }

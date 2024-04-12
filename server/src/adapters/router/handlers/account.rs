@@ -16,7 +16,7 @@ use axum::Json;
 
 #[utoipa::path(
 post,
-path = "/new",
+path = "/account/new",
 responses(
 (status = 201, description = "Account created successfully", body = TransactionResponse),
 )
@@ -34,7 +34,7 @@ pub async fn new_account(State(state): State<StorageState>) -> Result<Json<Trans
 
 #[utoipa::path(
 post,
-path = "/replenish",
+path = "/account/replenish",
 request_body = TransactionRequest,
 responses(
 (status = 200, description = "Account replenished successfully", body = TransactionResponse),
@@ -71,7 +71,7 @@ pub async fn replenish(
 
 #[utoipa::path(
 post,
-path = "/withdraw",
+path = "/account/withdraw",
 request_body = TransactionRequest,
 responses(
 (status = 200, description = "Account withdrawed successfully", body = TransactionResponse),
@@ -108,7 +108,7 @@ pub async fn withdraw(
 
 #[utoipa::path(
 post,
-path = "/transfer",
+path = "/account/transfer",
 request_body = TransferRequest,
 responses(
 (status = 200, description = "Transfered successfully", body = TransferResponse),
@@ -141,7 +141,7 @@ pub async fn transfer(
 
 #[utoipa::path(
 get,
-path = "/balance/{account}",
+path = "/account/balance/{account}",
 params(
 ("account" = String, Path, description = "account name")
 ),
@@ -151,12 +151,12 @@ responses(
 {"error": AccountExistsErr(String::from("account_№n")).to_string()})),
 ))]
 /// Баланса счета
-pub async fn get_balance(
+pub async fn balance(
     State(state): State<StorageState>,
     Path(account_name): Path<String>,
 ) -> Result<Json<BalanceResponse>> {
     // Баланса счета
-    let balance: BalanceResponse = match usecases::account::get_balance(state, account_name) {
+    let balance: BalanceResponse = match usecases::account::balance(state, account_name) {
         Ok(res) => res,
         Err(err) => {
             return Err(err);
@@ -164,4 +164,31 @@ pub async fn get_balance(
     };
     // 200
     Ok(Json(balance))
+}
+
+#[utoipa::path(
+get,
+path = "/account/{account}",
+params(
+("account" = String, Path, description = "account name")
+),
+responses(
+(status = 200, description = "Got account successfully", body = Account),
+(status = 404, description = "Account not found", body = AppError, example = json!(
+{"error": AccountExistsErr(String::from("account_№n")).to_string()})),
+))]
+/// Получение всех транзакций счета
+pub async fn account(
+    State(state): State<StorageState>,
+    Path(account_name): Path<String>,
+) -> Result<Json<Account>> {
+    // получение счета
+    let acc: Account = match usecases::account::account(state, account_name) {
+        Ok(res) => res,
+        Err(err) => {
+            return Err(err);
+        }
+    };
+    // 200
+    Ok(Json(acc))
 }

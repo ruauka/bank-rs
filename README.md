@@ -25,6 +25,7 @@ Service allows work with:
             - [Withdraw](#withdraw)
             - [Transfer](#transfer)
             - [Balance](#balance)
+            - [State](#state)
         - [Transaction](#transaction)
             - [Get](#get)
         - [Storage](#storage)
@@ -170,6 +171,10 @@ The transaction is `replicated`.
 ### Balance
 
 Get account `balance`.
+
+### State
+
+Get `account` with all transactions.
 
 ### Transaction
 
