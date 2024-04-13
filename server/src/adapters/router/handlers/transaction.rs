@@ -3,7 +3,7 @@ use crate::adapters::storage::StorageState;
 use crate::domain::entities::account::Account;
 use crate::domain::entities::transaction::Transaction;
 use crate::domain::errors::AppError::{AccountExistsErr, TransactionExistsErr};
-use crate::domain::errors::Result;
+use crate::domain::errors::{AppError, Result};
 use crate::domain::usecases;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
@@ -28,15 +28,7 @@ responses(
 pub async fn transaction(
     State(state): State<StorageState>,
     Path((account_name, transaction_id)): Path<(String, u32)>,
-) -> Result<Json<Transaction>> {
+) -> Result<Json<Transaction>, AppError> {
     // получение транзакции по id
-    let tx: Transaction =
-        match usecases::transaction::transaction(state, account_name, transaction_id) {
-            Ok(res) => res,
-            Err(err) => {
-                return Err(err);
-            }
-        };
-    // 200
-    Ok(Json(tx))
+    usecases::transaction::transaction(state, account_name, transaction_id).map(Json)
 }

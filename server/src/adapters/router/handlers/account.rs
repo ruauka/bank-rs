@@ -18,18 +18,16 @@ use axum::Json;
 post,
 path = "/account/new",
 responses(
-(status = 201, description = "Account created successfully", body = TransactionResponse),
+(status = 200, description = "Account created successfully", body = TransactionResponse),
 )
 )]
 /// Создание нового счета
 ///
 /// Хендлер создания нового счета. Счета имееют имя: account_ и число. Пример: account_1.
 /// Имя счетов формируются автоматически. Имя первого счета: account_1.
-pub async fn new_account(State(state): State<StorageState>) -> Result<Json<TransactionResponse>> {
+pub async fn new_account(State(state): State<StorageState>) -> Json<TransactionResponse> {
     // новый счета
-    let tx: TransactionResponse = usecases::account::new_account(state);
-    // 201
-    Ok(Json(tx))
+    Json(usecases::account::new_account(state))
 }
 
 #[utoipa::path(
@@ -52,21 +50,19 @@ responses(
 pub async fn replenish(
     State(state): State<StorageState>,
     Json(payload): Json<TransactionRequest>,
-) -> Result<Json<TransactionResponse>> {
+) -> Result<Json<TransactionResponse>, AppError> {
     // пополнение счета
-    let tx: TransactionResponse = match usecases::account::change_acc_balance(
+    let res: Result<Json<TransactionResponse>, AppError> = usecases::account::change_acc_balance(
         &state,
         payload.transaction_value.unwrap(),
         &payload.account_name,
         Replenish,
-    ) {
-        Ok(res) => res,
-        Err(err) => {
-            return Err(err);
-        }
-    };
-    // 200
-    Ok(Json(tx))
+    )
+    .map(Json);
+    // для себя, запомнить
+    // map применяет функцию (экстактор Json в данном случае) к OK значению из change_acc_balance
+
+    Ok(res.unwrap())
 }
 
 #[utoipa::path(
@@ -89,21 +85,15 @@ responses(
 pub async fn withdraw(
     State(state): State<StorageState>,
     Json(payload): Json<TransactionRequest>,
-) -> Result<Json<TransactionResponse>> {
+) -> Result<Json<TransactionResponse>, AppError> {
     // списание со счета
-    let tx: TransactionResponse = match usecases::account::change_acc_balance(
+    usecases::account::change_acc_balance(
         &state,
         payload.transaction_value.unwrap(),
         &payload.account_name,
         Withdraw,
-    ) {
-        Ok(res) => res,
-        Err(err) => {
-            return Err(err);
-        }
-    };
-    // 200
-    Ok(Json(tx))
+    )
+    .map(Json)
 }
 
 #[utoipa::path(
@@ -127,16 +117,9 @@ responses(
 pub async fn transfer(
     State(state): State<StorageState>,
     Json(payload): Json<TransferRequest>,
-) -> Result<Json<TransferResponse>> {
+) -> Result<Json<TransferResponse>, AppError> {
     // Перевод со счета на счет
-    let tx: TransferResponse = match usecases::account::transfer(state, payload) {
-        Ok(res) => res,
-        Err(err) => {
-            return Err(err);
-        }
-    };
-    // 200
-    Ok(Json(tx))
+    usecases::account::transfer(state, payload).map(Json)
 }
 
 #[utoipa::path(
@@ -154,16 +137,9 @@ responses(
 pub async fn balance(
     State(state): State<StorageState>,
     Path(account_name): Path<String>,
-) -> Result<Json<BalanceResponse>> {
+) -> Result<Json<BalanceResponse>, AppError> {
     // Баланса счета
-    let balance: BalanceResponse = match usecases::account::balance(state, account_name) {
-        Ok(res) => res,
-        Err(err) => {
-            return Err(err);
-        }
-    };
-    // 200
-    Ok(Json(balance))
+    usecases::account::balance(state, account_name).map(Json)
 }
 
 #[utoipa::path(
@@ -181,14 +157,7 @@ responses(
 pub async fn account(
     State(state): State<StorageState>,
     Path(account_name): Path<String>,
-) -> Result<Json<Account>> {
+) -> Result<Json<Account>, AppError> {
     // получение счета
-    let acc: Account = match usecases::account::account(state, account_name) {
-        Ok(res) => res,
-        Err(err) => {
-            return Err(err);
-        }
-    };
-    // 200
-    Ok(Json(acc))
+    usecases::account::account(state, account_name).map(Json)
 }

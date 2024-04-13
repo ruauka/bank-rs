@@ -1,7 +1,7 @@
 use crate::adapters::storage::StorageState;
 use crate::domain::entities::account::Account;
 use crate::domain::errors::AppError::{AccountExistsErr, BackupLoadFileErr, EmptyDbErr};
-use crate::domain::errors::Result;
+use crate::domain::errors::{AppError, Result};
 use crate::domain::usecases;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
@@ -17,16 +17,11 @@ responses(
 )
 )]
 /// Получение бд
-pub async fn history(State(state): State<StorageState>) -> Result<Json<HashMap<String, Account>>> {
+pub async fn history(
+    State(state): State<StorageState>,
+) -> Result<Json<HashMap<String, Account>>, AppError> {
     // получение всех транзакций бд в разбивке по счетам
-    let db: HashMap<String, Account> = match usecases::storage::history(state) {
-        Ok(res) => res,
-        Err(err) => {
-            return Err(err);
-        }
-    };
-    // 200
-    Ok(Json(db))
+    usecases::storage::history(state).map(Json)
 }
 
 #[utoipa::path(
@@ -38,11 +33,11 @@ responses(
 )
 )]
 /// Восстановление бд
-pub async fn backup(State(state): State<StorageState>) -> Result<Json<HashMap<String, String>>> {
+pub async fn backup(
+    State(state): State<StorageState>,
+) -> Result<Json<HashMap<String, String>>, AppError> {
     // backup бд
-    if let Err(err) = usecases::storage::backup(state) {
-        return Err(err);
-    };
+    usecases::storage::backup(state)?;
     // 200
     Ok(Json(HashMap::from([(
         "info".to_string(),

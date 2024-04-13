@@ -5,6 +5,7 @@ use serde::Serialize;
 use serde_json::json;
 use std::collections::HashMap;
 use std::fs;
+use std::path::Path;
 use std::sync::{Arc, RwLock};
 
 /// Путь к backup.json для бэкапа db.
@@ -80,7 +81,7 @@ impl AccountStorage for AccountStorageImpl {
         let payload: String = String::from_utf8(buf).unwrap();
 
         // запись в файл для бэкапа
-        if let Err(err) = fs::write(format!("{}/{}", &PATH, "backup.json"), &payload) {
+        if let Err(err) = fs::write(Path::new(&PATH).join("backup.json"), &payload) {
             panic!("file backup.json write err: {}", err);
         }
     }
@@ -88,13 +89,8 @@ impl AccountStorage for AccountStorageImpl {
     /// Восстановление бд из файла backup.json.
     fn backup_load(&mut self) -> Result<(), AppError> {
         // чтение файла backup.json
-        let backup_payload: String =
-            match fs::read_to_string(format!("{}/{}", &PATH, "backup.json")) {
-                Ok(res) => res,
-                Err(_) => {
-                    return Err(BackupLoadFileErr);
-                }
-            };
+        let backup_payload: String = fs::read_to_string(Path::new(&PATH).join("backup.json"))
+            .map_err(|_| BackupLoadFileErr)?;
 
         let backup_bd: HashMap<String, Account> = serde_json::from_str(&backup_payload).unwrap();
         self.accounts = backup_bd;
