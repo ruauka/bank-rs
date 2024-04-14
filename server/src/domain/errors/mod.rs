@@ -28,9 +28,15 @@ pub enum AppError {
     // транзакция самому себе
     #[error("forbid transaction to yourself")]
     SelfTransactionErr,
-    // транзакция не существует
+    // пустая бд
     #[error("empty database")]
     EmptyDbErr,
+    // пустой файл backup.json
+    #[error("empty backup.json")]
+    EmptyReplicaFile,
+    // ошибка при сериализации backup.json в HashMap<String, Account>
+    #[error("invalid backup.json")]
+    InvalidReplicaFile,
     // ошибка загрузки файла репликации backup.json
     #[error("backup load file error")]
     BackupLoadFileErr,
@@ -50,6 +56,8 @@ impl IntoResponse for AppError {
             | AppError::OverdraftErr
             | AppError::SelfTransactionErr
             | AppError::EmptyDbErr
+            | AppError::EmptyReplicaFile
+            | AppError::InvalidReplicaFile
             | AppError::BackupLoadFileErr => (StatusCode::BAD_REQUEST, self.to_string()),
             // AppError::Other(_) => (StatusCode::INTERNAL_SERVER_ERROR, self.to_string()),
         };
