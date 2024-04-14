@@ -1,20 +1,16 @@
 use crate::adapters::storage::cache::Cache;
-use crate::adapters::storage::{StorageState, Storages};
+use crate::adapters::storage::Storages;
 use crate::domain::entities::account::{Account, BalanceResponse};
 use crate::domain::entities::transaction::Operation::{
     Replenish, TransferDecrease, TransferIncrease, Withdraw,
 };
 use crate::domain::entities::transaction::{
-    Operation, Transaction, TransactionRequest, TransactionResponse, TransferRequest,
-    TransferResponse,
+    Operation, Transaction, TransactionResponse, TransferRequest, TransferResponse,
 };
 use crate::domain::errors::AppError;
 use crate::domain::errors::AppError::{
     AccountExistsErr, OverdraftErr, SelfTransactionErr, ZeroValueTransactionErr,
 };
-use crate::domain::usecases;
-use axum::extract::State;
-use axum::Json;
 use std::sync::{Arc, RwLock};
 
 pub fn new_account<S: Storages>(storage: Arc<RwLock<S>>) -> TransactionResponse {
@@ -53,7 +49,7 @@ pub fn change_acc_balance<S: Storages>(
     operation: Operation,
 ) -> Result<TransactionResponse, AppError> {
     // проверка наличия счета
-    if !storage.write().unwrap().db().check_key(&account_name) {
+    if !storage.write().unwrap().db().check_key(account_name) {
         return Err(AccountExistsErr(account_name.to_string()));
     }
     // проверка на наличие изменение баланса на 0 или меньше
@@ -63,7 +59,7 @@ pub fn change_acc_balance<S: Storages>(
 
     let mut binding = storage.write().unwrap();
     // получение счета
-    let mut cur_acc: &mut Account = binding.db().get_mut_account(&account_name);
+    let cur_acc: &mut Account = binding.db().get_mut_account(account_name);
     // проверка на снятие или перевод больше, чем есть на счете
     if (operation == Withdraw || operation == TransferDecrease) && cur_acc.balance < trans_value {
         return Err(OverdraftErr);
@@ -130,16 +126,10 @@ pub fn transfer<S: Storages>(
         return Err(AccountExistsErr(payload.account_to));
     }
     // списание со счета отправителя
-    if let Err(err) =
-        change_acc_balance(&storage, tx_value, &payload.account_from, TransferDecrease)
-    {
-        return Err(err);
-    }
+    change_acc_balance(&storage, tx_value, &payload.account_from, TransferDecrease)?;
     // пополнение счета получателя
-    if let Err(err) = change_acc_balance(&storage, tx_value, &payload.account_to, TransferIncrease)
-    {
-        return Err(err);
-    }
+    change_acc_balance(&storage, tx_value, &payload.account_to, TransferIncrease)?;
+
     // body
     let tx: TransferResponse = TransferResponse::new(p);
     // backup

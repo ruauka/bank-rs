@@ -1,12 +1,11 @@
 use crate::adapters::storage::StorageState;
 use crate::domain::entities::account::Account;
 use crate::domain::errors::AppError::{
-    AccountExistsErr, BackupLoadFileErr, EmptyDbErr, EmptyReplicaFile, InvalidReplicaFile,
+    BackupLoadFileErr, EmptyDbErr, EmptyReplicaFile, InvalidReplicaFile,
 };
 use crate::domain::errors::{AppError, Result};
 use crate::domain::usecases;
-use axum::extract::{Path, State};
-use axum::http::StatusCode;
+use axum::extract::State;
 use axum::Json;
 use std::collections::HashMap;
 

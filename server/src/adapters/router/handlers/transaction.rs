@@ -1,13 +1,10 @@
-use crate::adapters::storage::cache::Cache;
 use crate::adapters::storage::StorageState;
-use crate::domain::entities::account::Account;
 use crate::domain::entities::transaction::Transaction;
 use crate::domain::errors::AppError::{AccountExistsErr, TransactionExistsErr};
 use crate::domain::errors::{AppError, Result};
 use crate::domain::usecases;
 use axum::extract::{Path, State};
-use axum::http::StatusCode;
-use axum::{Extension, Json};
+use axum::Json;
 
 #[utoipa::path(
 get,

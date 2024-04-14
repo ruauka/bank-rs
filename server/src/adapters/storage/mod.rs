@@ -1,9 +1,6 @@
 pub mod cache;
 
 use crate::adapters::storage::cache::{Cache, CacheImpl};
-use crate::domain::entities::account::Account;
-use axum::Extension;
-use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 
 /// Тип 'state' сервиса.

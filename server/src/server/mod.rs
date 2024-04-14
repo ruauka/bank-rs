@@ -1,7 +1,7 @@
 mod cli;
 
 use crate::adapters::router::router;
-use crate::adapters::storage::cache::{CacheImpl, PATH};
+use crate::adapters::storage::cache::PATH;
 use crate::adapters::storage::{Storage, StorageState};
 use crate::server::cli::Cli;
 use axum::Router;

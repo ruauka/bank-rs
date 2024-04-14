@@ -1,7 +1,7 @@
 use crate::adapters::storage::cache::Cache;
 use crate::adapters::storage::Storages;
 use crate::domain::entities::account::Account;
-use crate::domain::entities::transaction::{Transaction, TransactionResponse};
+use crate::domain::entities::transaction::Transaction;
 use crate::domain::errors::AppError;
 use crate::domain::errors::AppError::{AccountExistsErr, TransactionExistsErr};
 use std::sync::{Arc, RwLock};

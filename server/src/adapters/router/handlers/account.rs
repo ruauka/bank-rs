@@ -1,9 +1,8 @@
-use crate::adapters::storage::{Storage, StorageState};
+use crate::adapters::storage::StorageState;
 use crate::domain::entities::account::{Account, BalanceResponse};
 use crate::domain::entities::transaction::{
-    Operation,
-    Operation::{Replenish, TransferDecrease, TransferIncrease, Withdraw},
-    Transaction, TransactionRequest, TransactionResponse, TransferRequest, TransferResponse,
+    Operation::{Replenish, Withdraw},
+    TransactionRequest, TransactionResponse, TransferRequest, TransferResponse,
 };
 use crate::domain::errors::AppError::{
     AccountExistsErr, OverdraftErr, SelfTransactionErr, ZeroValueTransactionErr,
@@ -11,7 +10,6 @@ use crate::domain::errors::AppError::{
 use crate::domain::errors::{AppError, Result};
 use crate::domain::usecases;
 use axum::extract::{Path, State};
-use axum::http::StatusCode;
 use axum::Json;
 
 #[utoipa::path(

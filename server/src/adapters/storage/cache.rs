@@ -1,14 +1,11 @@
 use crate::domain::entities::account::Account;
 use crate::domain::errors::AppError;
-use crate::domain::errors::AppError::{
-    BackupLoadFileErr, EmptyDbErr, EmptyReplicaFile, InvalidReplicaFile,
-};
+use crate::domain::errors::AppError::{BackupLoadFileErr, EmptyReplicaFile, InvalidReplicaFile};
 use serde::Serialize;
 use serde_json::json;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
-use std::sync::{Arc, RwLock};
 
 /// Путь к backup.json для бэкапа db.
 pub const PATH: &str = "server/backup";
@@ -23,9 +20,9 @@ pub struct CacheImpl {
 pub trait Cache {
     fn get_last_account_name(&self) -> String;
     fn create_account(&mut self, account: Account);
-    fn check_key(&mut self, acc_name: &String) -> bool;
-    fn get_mut_account(&mut self, acc_name: &String) -> &mut Account;
-    fn get_account(&self, acc_name: &String) -> &Account;
+    fn check_key(&mut self, acc_name: &str) -> bool;
+    fn get_mut_account(&mut self, acc_name: &str) -> &mut Account;
+    fn get_account(&self, acc_name: &str) -> &Account;
     fn get_accounts(&self) -> &HashMap<String, Account>;
     fn backup_store(&mut self);
     fn backup_load(&mut self) -> Result<(), AppError>;
@@ -53,17 +50,17 @@ impl Cache for CacheImpl {
     }
 
     /// Проверка наличия счета
-    fn check_key(&mut self, acc_name: &String) -> bool {
+    fn check_key(&mut self, acc_name: &str) -> bool {
         self.cache.contains_key(acc_name)
     }
 
     /// Получение счета для изменения баланса и добавления транзакций.
-    fn get_mut_account(&mut self, acc_name: &String) -> &mut Account {
+    fn get_mut_account(&mut self, acc_name: &str) -> &mut Account {
         self.cache.get_mut(acc_name).unwrap()
     }
 
     /// Получение счета.
-    fn get_account(&self, acc_name: &String) -> &Account {
+    fn get_account(&self, acc_name: &str) -> &Account {
         self.cache.get(acc_name).unwrap()
     }
 
@@ -83,7 +80,7 @@ impl Cache for CacheImpl {
         let payload: String = String::from_utf8(buf).unwrap();
 
         // запись в файл для бэкапа
-        if let Err(err) = fs::write(Path::new(&PATH).join("backup.json"), &payload) {
+        if let Err(err) = fs::write(Path::new(&PATH).join("backup.json"), payload) {
             panic!("file backup.json write err: {}", err);
         }
     }

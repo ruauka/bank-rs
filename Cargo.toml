@@ -6,3 +6,12 @@ members = [
     "server"
 ]
 resolver = "2"
+
+[workspace.lints]
+clippy.all = { level = "deny", priority = -1 }
+clippy.pedantic = { level = "deny", priority = -1 }
+clippy.restriction = { level = "deny", priority = -1 }
+clippy.cargo = { level = "deny", priority = -1 }
+clippy.nursery = "deny"
+
+#clippy.blanket-clippy-restriction-lints = "allow"

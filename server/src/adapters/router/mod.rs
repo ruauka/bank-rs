@@ -6,7 +6,6 @@ use crate::adapters::router::handlers::account::{
 use crate::adapters::router::handlers::storage::{backup, history};
 use crate::adapters::router::handlers::transaction::transaction;
 use crate::adapters::router::handlers::{account, storage, transaction};
-use crate::adapters::storage::cache::CacheImpl;
 use crate::adapters::storage::Storage;
 use crate::domain::entities::account::{Account, BalanceResponse, Status};
 use crate::domain::entities::transaction::{
@@ -15,7 +14,7 @@ use crate::domain::entities::transaction::{
 use crate::domain::entities::transaction::{TransferRequest, TransferResponse};
 use crate::domain::errors::AppError;
 use axum::routing::{get, post};
-use axum::{http::header::CONTENT_TYPE, Router};
+use axum::Router;
 use std::sync::{Arc, RwLock};
 use std::time::Duration;
 use tower_http::timeout::TimeoutLayer;
