@@ -109,8 +109,15 @@ in progress...
 To start service run in terminal:
 
 ```bash
-make run
+make run-server
 ```
+
+To customize server host and port use cli keys. Example:
+```bash
+cargo run -p server -- --host 0.0.0.0 --port 8000
+```
+
+Default values: `127.0.0.1:8080`
 
 Server stops with `graceful shutdown`.
 

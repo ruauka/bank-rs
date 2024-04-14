@@ -1,6 +1,8 @@
 use crate::adapters::storage::StorageState;
 use crate::domain::entities::account::Account;
-use crate::domain::errors::AppError::{AccountExistsErr, BackupLoadFileErr, EmptyDbErr};
+use crate::domain::errors::AppError::{
+    AccountExistsErr, BackupLoadFileErr, EmptyDbErr, EmptyReplicaFile, InvalidReplicaFile,
+};
 use crate::domain::errors::{AppError, Result};
 use crate::domain::usecases;
 use axum::extract::{Path, State};
@@ -29,7 +31,13 @@ post,
 path = "/storage/backup",
 responses(
 (status = 200, description = "Backup successfully", body = HashMap<String, String>, example = json!({"info": "successfully backup"})),
-(status = 400, description = "Backup load file error", body = AppError, example = json!({"error": BackupLoadFileErr.to_string()}))
+(status = 400, description = "Backup load file errors", body = AppError, example = json ! (
+[
+{"error1": BackupLoadFileErr.to_string()},
+{"error2": EmptyReplicaFile.to_string()},
+{"error3": InvalidReplicaFile.to_string()}
+]
+)),
 )
 )]
 /// Восстановление бд

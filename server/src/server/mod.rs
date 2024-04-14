@@ -1,17 +1,20 @@
+mod cli;
+
 use crate::adapters::router::router;
-use crate::adapters::storage::storage::{AccountStorageImpl, PATH};
+use crate::adapters::storage::cache::{CacheImpl, PATH};
 use crate::adapters::storage::{Storage, StorageState};
+use crate::server::cli::Cli;
 use axum::Router;
+use clap::Parser;
 use std::fs;
 use std::sync::{Arc, RwLock};
 use tokio::signal;
 use tracing::info;
 
-/// Хост и порт.
-const ADDRESS: &str = "127.0.0.1:8080";
-
 /// Основная функция. Инициализация и запуск сервиса.
 pub async fn execute() {
+    // cli-конфиг
+    let cfg: Cli = Cli::parse();
     // создание 'state' объекта
     let shared_state: Arc<RwLock<Storage>> = StorageState::default();
     // создание роутера и регистрация хендлеров и swagger
@@ -23,8 +26,10 @@ pub async fn execute() {
         .with_target(false)
         .compact()
         .init();
+    // хост и порт
+    let address: String = format!("{}:{}", cfg.host, cfg.port);
     // tcp-движок
-    let listener = tokio::net::TcpListener::bind(ADDRESS).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(address).await.unwrap();
     info!(
         "🚀 Server started successfully. Listening on {}...",
         listener.local_addr().unwrap()

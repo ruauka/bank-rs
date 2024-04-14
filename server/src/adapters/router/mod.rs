@@ -6,7 +6,7 @@ use crate::adapters::router::handlers::account::{
 use crate::adapters::router::handlers::storage::{backup, history};
 use crate::adapters::router::handlers::transaction::transaction;
 use crate::adapters::router::handlers::{account, storage, transaction};
-use crate::adapters::storage::storage::AccountStorageImpl;
+use crate::adapters::storage::cache::CacheImpl;
 use crate::adapters::storage::Storage;
 use crate::domain::entities::account::{Account, BalanceResponse, Status};
 use crate::domain::entities::transaction::{

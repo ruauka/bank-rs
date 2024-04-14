@@ -1,6 +1,6 @@
-pub mod storage;
+pub mod cache;
 
-use crate::adapters::storage::storage::{AccountStorage, AccountStorageImpl};
+use crate::adapters::storage::cache::{Cache, CacheImpl};
 use crate::domain::entities::account::Account;
 use axum::Extension;
 use std::collections::HashMap;
@@ -12,21 +12,21 @@ pub type StorageState = Arc<RwLock<Storage>>;
 /// Структура 'state' сервиса.
 #[derive(Debug, Default)]
 pub struct Storage {
-    pub db: AccountStorageImpl,
+    pub db: CacheImpl,
 }
 
 /// Трейт для слоя usecases.
 pub trait Storages {
-    type AccountStorageImpl: AccountStorage;
+    type CacheImpl: Cache;
 
-    fn db(&mut self) -> &mut Self::AccountStorageImpl;
+    fn db(&mut self) -> &mut Self::CacheImpl;
 }
 
 /// Имплементация Storages с &mut владением.
 impl Storages for Storage {
-    type AccountStorageImpl = AccountStorageImpl;
+    type CacheImpl = CacheImpl;
 
-    fn db(&mut self) -> &mut Self::AccountStorageImpl {
+    fn db(&mut self) -> &mut Self::CacheImpl {
         &mut self.db
     }
 }

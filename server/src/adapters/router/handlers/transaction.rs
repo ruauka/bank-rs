@@ -1,4 +1,4 @@
-use crate::adapters::storage::storage::AccountStorage;
+use crate::adapters::storage::cache::Cache;
 use crate::adapters::storage::StorageState;
 use crate::domain::entities::account::Account;
 use crate::domain::entities::transaction::Transaction;

@@ -18,3 +18,4 @@ utoipa = { version = "4", features = ["axum_extras"] }
 utoipa-swagger-ui = { version = "6", features = ["axum"] }
 anyhow = "1.0.81"
 tower = { version = "0.4", features = ["util"] }
+clap = { version = "4.5.4", features = ["derive"] }
