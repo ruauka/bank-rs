@@ -9,10 +9,11 @@ use crate::domain::entities::transaction::{
 };
 use crate::domain::errors::AppError;
 use crate::domain::errors::AppError::{
-    AccountExistsErr, OverdraftErr, SelfTransactionErr, ZeroValueTransactionErr,
+    AccountNotExists, Overdraft, SelfTransfer, ZeroValueTransaction,
 };
 use std::sync::{Arc, RwLock};
 
+/// Создание нового счета.
 pub fn new_account<S: Storages>(storage: Arc<RwLock<S>>) -> TransactionResponse {
     // получение названия последнего счета
     let last_name: String = storage.write().unwrap().db().get_last_account_name();
@@ -24,7 +25,7 @@ pub fn new_account<S: Storages>(storage: Arc<RwLock<S>>) -> TransactionResponse 
     // создание транзакиции о создании счета
     let tx_new: Transaction = Transaction::new(
         0_u32,
-        Operation::Registration.to_string().to_lowercase(),
+        Operation::default(),
         f64::default(),
         f64::default(),
         f64::default(),
@@ -50,11 +51,11 @@ pub fn change_acc_balance<S: Storages>(
 ) -> Result<TransactionResponse, AppError> {
     // проверка наличия счета
     if !storage.write().unwrap().db().check_key(account_name) {
-        return Err(AccountExistsErr(account_name.to_string()));
+        return Err(AccountNotExists(account_name.to_string()));
     }
     // проверка на наличие изменение баланса на 0 или меньше
     if trans_value <= 0_f64 {
-        return Err(ZeroValueTransactionErr);
+        return Err(ZeroValueTransaction);
     }
 
     let mut binding = storage.write().unwrap();
@@ -62,7 +63,7 @@ pub fn change_acc_balance<S: Storages>(
     let cur_acc: &mut Account = binding.db().get_mut_account(account_name);
     // проверка на снятие или перевод больше, чем есть на счете
     if (operation == Withdraw || operation == TransferDecrease) && cur_acc.balance < trans_value {
-        return Err(OverdraftErr);
+        return Err(Overdraft);
     }
     // id последней транзакции (совпадает с индексом)
     let last_tx_id: u32 = (cur_acc.transactions.len() - 1) as u32;
@@ -79,7 +80,7 @@ pub fn change_acc_balance<S: Storages>(
     // создание новой транзакции
     let tx_new: Transaction = Transaction::new(
         new_tx_id,
-        operation.to_string().to_lowercase(),
+        operation,
         cur_acc.transactions[last_tx_id as usize].current,
         trans_value,
         new_balance,
@@ -106,11 +107,11 @@ pub fn transfer<S: Storages>(
     let tx_value: f64 = payload.transfer_value;
     // проверка на наличие изменение баланса на 0 или меньше
     if tx_value <= 0_f64 {
-        return Err(ZeroValueTransactionErr);
+        return Err(ZeroValueTransaction);
     }
     // проверка на перевод самому себе
     if payload.account_to == payload.account_from {
-        return Err(SelfTransactionErr);
+        return Err(SelfTransfer);
     }
     // проверка наличия счета
     if !storage
@@ -119,11 +120,11 @@ pub fn transfer<S: Storages>(
         .db()
         .check_key(&payload.account_from)
     {
-        return Err(AccountExistsErr(payload.account_from));
+        return Err(AccountNotExists(payload.account_from));
     }
     // проверка наличия счета
     if !storage.write().unwrap().db().check_key(&payload.account_to) {
-        return Err(AccountExistsErr(payload.account_to));
+        return Err(AccountNotExists(payload.account_to));
     }
     // списание со счета отправителя
     change_acc_balance(&storage, tx_value, &payload.account_from, TransferDecrease)?;
@@ -145,7 +146,7 @@ pub fn balance<S: Storages>(
 ) -> Result<BalanceResponse, AppError> {
     // проверка наличия счета
     if !storage.write().unwrap().db().check_key(&account_name) {
-        return Err(AccountExistsErr(account_name));
+        return Err(AccountNotExists(account_name));
     }
     let mut binding = storage.write().unwrap();
     // получение счета
@@ -163,7 +164,7 @@ pub fn account<S: Storages>(
 ) -> Result<Account, AppError> {
     // проверка наличия счета
     if !storage.write().unwrap().db().check_key(&account_name) {
-        return Err(AccountExistsErr(account_name.to_string()));
+        return Err(AccountNotExists(account_name.to_string()));
     }
 
     let mut binding = storage.write().unwrap();

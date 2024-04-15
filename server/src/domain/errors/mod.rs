@@ -14,31 +14,31 @@ pub enum AppError {
     // #[schema(example = "Some error from enum 'Errors'")]
     // счет не существует
     #[error("account with name: '{0}' not found")]
-    AccountExistsErr(String),
+    AccountNotExists(String),
     // транзакция не существует
     #[error("account: '{0}' has no transaction with id: '{1}'")]
-    TransactionExistsErr(String, String),
+    TransactionNotExists(String, String),
     // транзакция со значением 0
     #[error("forbid transaction with 0 or less")]
-    ZeroValueTransactionErr,
+    ZeroValueTransaction,
     // на счете не хватает средств для проведения транзакция
     #[error("account balance less than operation value")]
-    OverdraftErr,
+    Overdraft,
     // транзакция самому себе
     #[error("forbid transaction to yourself")]
-    SelfTransactionErr,
+    SelfTransfer,
     // пустая бд
     #[error("empty database")]
-    EmptyDbErr,
+    EmptyDb,
     // пустой файл backup.json
     #[error("empty backup.json")]
-    EmptyReplicaFile,
+    EmptyBackupFile,
     // ошибка при сериализации backup.json в HashMap<String, Account>
     #[error("invalid backup.json")]
-    InvalidReplicaFile,
+    InvalidBackupFile,
     // ошибка загрузки файла репликации backup.json
     #[error("backup load file error")]
-    BackupLoadFileErr,
+    BackupLoadFile,
     // // остальные
     // #[error(transparent)]
     // Other(#[from] anyhow::Error),
@@ -48,16 +48,16 @@ pub enum AppError {
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         let (status, err_msg) = match self {
-            AppError::AccountExistsErr(_) | AppError::TransactionExistsErr(_, _) => {
+            AppError::AccountNotExists(_) | AppError::TransactionNotExists(_, _) => {
                 (StatusCode::NOT_FOUND, self.to_string())
             }
-            AppError::ZeroValueTransactionErr
-            | AppError::OverdraftErr
-            | AppError::SelfTransactionErr
-            | AppError::EmptyDbErr
-            | AppError::EmptyReplicaFile
-            | AppError::InvalidReplicaFile
-            | AppError::BackupLoadFileErr => (StatusCode::BAD_REQUEST, self.to_string()),
+            AppError::ZeroValueTransaction
+            | AppError::Overdraft
+            | AppError::SelfTransfer
+            | AppError::EmptyDb
+            | AppError::EmptyBackupFile
+            | AppError::InvalidBackupFile
+            | AppError::BackupLoadFile => (StatusCode::BAD_REQUEST, self.to_string()),
             // AppError::Other(_) => (StatusCode::INTERNAL_SERVER_ERROR, self.to_string()),
         };
         let body = Json(json!({

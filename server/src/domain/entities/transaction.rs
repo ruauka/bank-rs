@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
-use std::fmt;
 use utoipa::ToSchema;
 
 /// Статусы транзакции.
-#[derive(Debug, PartialEq, Clone, Deserialize, Serialize, ToSchema)]
+#[derive(Debug, Default, PartialEq, Clone, Deserialize, Serialize, ToSchema)]
 pub enum Operation {
+    #[default]
     Registration,
     Replenish,
     Withdraw,
@@ -12,18 +12,11 @@ pub enum Operation {
     TransferDecrease,
 }
 
-/// to_string().to_lowercase() для значения в Json
-impl fmt::Display for Operation {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
 /// Структура транзакции.
 #[derive(Debug, Default, Clone, Deserialize, Serialize, ToSchema)]
 pub struct Transaction {
     pub id: u32,
-    pub operation: String,
+    pub operation: Operation,
     pub previous: f64,
     pub delta: f64,
     pub current: f64,
@@ -31,7 +24,7 @@ pub struct Transaction {
 
 impl Transaction {
     /// Конструктор транзакции.
-    pub fn new(id: u32, operation: String, previous: f64, delta: f64, current: f64) -> Self {
+    pub fn new(id: u32, operation: Operation, previous: f64, delta: f64, current: f64) -> Self {
         Self {
             id,
             operation,

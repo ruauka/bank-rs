@@ -5,7 +5,7 @@ use crate::domain::entities::transaction::{
     TransactionRequest, TransactionResponse, TransferRequest, TransferResponse,
 };
 use crate::domain::errors::AppError::{
-    AccountExistsErr, OverdraftErr, SelfTransactionErr, ZeroValueTransactionErr,
+    AccountNotExists, Overdraft, SelfTransfer, ZeroValueTransaction,
 };
 use crate::domain::errors::{AppError, Result};
 use crate::domain::usecases;
@@ -24,7 +24,6 @@ responses(
 /// Хендлер создания нового счета. Счета имееют имя: account_ и число. Пример: account_1.
 /// Имя счетов формируются автоматически. Имя первого счета: account_1.
 pub async fn new_account(State(state): State<StorageState>) -> Json<TransactionResponse> {
-    // новый счета
     Json(usecases::account::new_account(state))
 }
 
@@ -36,12 +35,12 @@ responses(
 (status = 200, description = "Account replenished successfully", body = TransactionResponse),
 (status = 400, description = "Errors", body = AppError, example = json!(
 [
-{"error1": ZeroValueTransactionErr.to_string()},
-{"error2": OverdraftErr.to_string()}
+{"error1": ZeroValueTransaction.to_string()},
+{"error2": Overdraft.to_string()}
 ]
 )),
 (status = 404, description = "Account not found", body = AppError, example = json!(
-{"error": AccountExistsErr(String::from("account_№n")).to_string()}
+{"error": AccountNotExists(String::from("account_№n")).to_string()}
 )),
 ))]
 /// Пополнение счета
@@ -49,7 +48,6 @@ pub async fn replenish(
     State(state): State<StorageState>,
     Json(payload): Json<TransactionRequest>,
 ) -> Result<Json<TransactionResponse>, AppError> {
-    // пополнение счета
     let res: Result<Json<TransactionResponse>, AppError> = usecases::account::change_acc_balance(
         &state,
         payload.transaction_value.unwrap(),
@@ -71,12 +69,12 @@ responses(
 (status = 200, description = "Account withdrawed successfully", body = TransactionResponse),
 (status = 400, description = "Errors", body = AppError, example = json ! (
 [
-{"error1": ZeroValueTransactionErr.to_string()},
-{"error2": OverdraftErr.to_string()}
+{"error1": ZeroValueTransaction.to_string()},
+{"error2": Overdraft.to_string()}
 ]
 )),
 (status = 404, description = "Account not found", body = AppError, example = json!(
-{"error": AccountExistsErr(String::from("account_№n")).to_string()}
+{"error": AccountNotExists(String::from("account_№n")).to_string()}
 )),
 ))]
 /// Списание со счета
@@ -84,7 +82,6 @@ pub async fn withdraw(
     State(state): State<StorageState>,
     Json(payload): Json<TransactionRequest>,
 ) -> Result<Json<TransactionResponse>, AppError> {
-    // списание со счета
     usecases::account::change_acc_balance(
         &state,
         payload.transaction_value.unwrap(),
@@ -102,13 +99,13 @@ responses(
 (status = 200, description = "Transfered successfully", body = TransferResponse),
 (status = 400, description = "Errors", body = AppError, example = json ! (
 [
-{"error1": ZeroValueTransactionErr.to_string()},
-{"error2": SelfTransactionErr.to_string()},
-{"error3": OverdraftErr.to_string()}
+{"error1": ZeroValueTransaction.to_string()},
+{"error2": SelfTransfer.to_string()},
+{"error3": Overdraft.to_string()}
 ]
 )),
 (status = 404, description = "Account not found", body = AppError, example = json!(
-{"error": AccountExistsErr(String::from("account_№n")).to_string()}
+{"error": AccountNotExists(String::from("account_№n")).to_string()}
 )),
 ))]
 /// Перевод со счета на счет
@@ -116,7 +113,6 @@ pub async fn transfer(
     State(state): State<StorageState>,
     Json(payload): Json<TransferRequest>,
 ) -> Result<Json<TransferResponse>, AppError> {
-    // Перевод со счета на счет
     usecases::account::transfer(state, payload).map(Json)
 }
 
@@ -129,14 +125,13 @@ params(
 responses(
 (status = 200, description = "Got balance successfully", body = BalanceResponse),
 (status = 404, description = "Account not found", body = AppError, example = json!(
-{"error": AccountExistsErr(String::from("account_№n")).to_string()})),
+{"error": AccountNotExists(String::from("account_№n")).to_string()})),
 ))]
-/// Баланса счета
+/// Баланс счета
 pub async fn balance(
     State(state): State<StorageState>,
     Path(account_name): Path<String>,
 ) -> Result<Json<BalanceResponse>, AppError> {
-    // Баланса счета
     usecases::account::balance(state, account_name).map(Json)
 }
 
@@ -149,13 +144,12 @@ params(
 responses(
 (status = 200, description = "Got account successfully", body = Account),
 (status = 404, description = "Account not found", body = AppError, example = json!(
-{"error": AccountExistsErr(String::from("account_№n")).to_string()})),
+{"error": AccountNotExists(String::from("account_№n")).to_string()})),
 ))]
 /// Получение счета
 pub async fn account(
     State(state): State<StorageState>,
     Path(account_name): Path<String>,
 ) -> Result<Json<Account>, AppError> {
-    // получение счета
     usecases::account::account(state, account_name).map(Json)
 }
