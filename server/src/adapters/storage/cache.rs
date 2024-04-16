@@ -36,8 +36,6 @@ pub trait Cache {
     fn backup_load(&mut self) -> Result<(), AppError>;
 }
 
-/// Имплементация трейта бд
-// #[async_trait]
 impl Cache for CacheImpl {
     fn get_last_account_name(&self) -> String {
         // проверка на пустое db

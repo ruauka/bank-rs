@@ -62,7 +62,7 @@ pub fn change_acc_balance<S: Storages>(
     // получение счета
     let cur_acc: &mut Account = binding.db().get_mut_account(account_name);
     // проверка на снятие или перевод больше, чем есть на счете
-    if (operation == Withdraw || operation == TransferDecrease) && cur_acc.balance < trans_value {
+    if matches!(operation, Withdraw | TransferDecrease) && cur_acc.balance < trans_value {
         return Err(Overdraft);
     }
     // id последней транзакции (совпадает с индексом)
