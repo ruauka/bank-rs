@@ -24,7 +24,7 @@ responses(
 /// Получение транзакции по id
 pub async fn transaction(
     State(state): State<StorageState>,
-    Path((account_name, transaction_id)): Path<(String, u32)>,
+    Path((account_id, transaction_id)): Path<(u32, u32)>,
 ) -> Result<Json<Transaction>, AppError> {
-    usecases::transaction::transaction(state, account_name, transaction_id).map(Json)
+    usecases::transaction::transaction(state, account_id, transaction_id).map(Json)
 }

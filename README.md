@@ -150,10 +150,7 @@ For more information about service handlers look at `swagger`.
 
 ### Create
 
-The accounts have a name: `account_` and a `number`.
-
-Example: `account_1`. The account names are generated automatically.
-The name of the `first account: account_1`.
+Create new account.
 
 The transaction is `replicated`.
 

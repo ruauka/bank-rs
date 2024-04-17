@@ -7,9 +7,9 @@ use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 
 /// Получение всех счетов.
-pub fn history<S: Storages>(storage: Arc<RwLock<S>>) -> Result<HashMap<String, Account>, AppError> {
+pub fn history<S: Storages>(storage: Arc<RwLock<S>>) -> Result<HashMap<u32, Account>, AppError> {
     // копия бд
-    let db: HashMap<String, Account> = storage.write().unwrap().db().get_accounts().clone();
+    let db: HashMap<u32, Account> = storage.write().unwrap().db().get_accounts().clone();
     // проверка на пустую бд
     if db.is_empty() {
         return Err(EmptyDb);

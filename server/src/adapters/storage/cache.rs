@@ -13,23 +13,22 @@ pub const PATH: &str = "server/backup";
 /// Структура db (in-memory).
 #[derive(Debug, Default)]
 pub struct CacheImpl {
-    pub cache: HashMap<String, Account>,
+    pub id: u32,
+    pub cache: HashMap<u32, Account>,
 }
 
 /// Трейт бд
 pub trait Cache {
-    /// Получение названия последнего счета для инкремента и создания нового счета.
-    fn get_last_account_name(&self) -> String;
     /// Создание нового счета.
-    fn create_account(&mut self, account: Account);
+    fn create_account(&mut self, account: Account) -> u32;
     /// Проверка наличия счета
-    fn check_key(&mut self, acc_name: &str) -> bool;
+    fn check_key(&mut self, acc_id: u32) -> bool;
     /// Получение счета для изменения баланса и добавления транзакций.
-    fn get_mut_account(&mut self, acc_name: &str) -> &mut Account;
+    fn get_mut_account(&mut self, acc_id: u32) -> &mut Account;
     /// Получение счета.
-    fn get_account(&self, acc_name: &str) -> &Account;
+    fn get_account(&self, acc_id: u32) -> &Account;
     /// Получение всех счетов.
-    fn get_accounts(&self) -> &HashMap<String, Account>;
+    fn get_accounts(&self) -> &HashMap<u32, Account>;
     /// Репликация бд в файл backup.json.
     fn backup_store(&mut self);
     /// Восстановление бд из файла backup.json.
@@ -37,35 +36,30 @@ pub trait Cache {
 }
 
 impl Cache for CacheImpl {
-    fn get_last_account_name(&self) -> String {
-        // проверка на пустое db
-        if self.cache.is_empty() {
-            return "".to_string();
-        };
-        // получение названия последнего счета
-        let mut acc_names: Vec<&String> = self.cache.keys().collect();
-        acc_names.sort();
-        acc_names.last().unwrap().to_string()
+    fn create_account(&mut self, mut account: Account) -> u32 {
+        // инкрементирование номера счета
+        self.id += 1;
+        // добавление id счета
+        account.id = self.id;
+        // добавление в кэш
+        self.cache.insert(self.id, account);
+
+        self.id
     }
 
-    fn create_account(&mut self, account: Account) {
-        let key: String = account.name.to_string();
-        self.cache.insert(key, account);
+    fn check_key(&mut self, acc_id: u32) -> bool {
+        self.cache.contains_key(&acc_id)
     }
 
-    fn check_key(&mut self, acc_name: &str) -> bool {
-        self.cache.contains_key(acc_name)
+    fn get_mut_account(&mut self, acc_id: u32) -> &mut Account {
+        self.cache.get_mut(&acc_id).unwrap()
     }
 
-    fn get_mut_account(&mut self, acc_name: &str) -> &mut Account {
-        self.cache.get_mut(acc_name).unwrap()
+    fn get_account(&self, acc_id: u32) -> &Account {
+        self.cache.get(&acc_id).unwrap()
     }
 
-    fn get_account(&self, acc_name: &str) -> &Account {
-        self.cache.get(acc_name).unwrap()
-    }
-
-    fn get_accounts(&self) -> &HashMap<String, Account> {
+    fn get_accounts(&self) -> &HashMap<u32, Account> {
         &self.cache
     }
 
@@ -93,7 +87,7 @@ impl Cache for CacheImpl {
             return Err(EmptyBackupFile);
         }
         // backup
-        let backup_bd: HashMap<String, Account> =
+        let backup_bd: HashMap<u32, Account> =
             serde_json::from_str(&backup_payload).map_err(|_| InvalidBackupFile)?;
         self.cache = backup_bd;
 

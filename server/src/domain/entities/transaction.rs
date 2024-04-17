@@ -38,23 +38,23 @@ impl Transaction {
 /// Структура для парсинга деталий транзакции.
 #[derive(Deserialize, ToSchema)]
 pub struct TransactionRequest {
-    pub account_name: String,
+    pub account_id: u32,
     pub transaction_value: Option<f64>,
 }
 
 /// Структура ответа совершенной транзакции.
 #[derive(Serialize, ToSchema)]
 pub struct TransactionResponse {
-    pub account_name: String,
+    pub account_id: u32,
     pub transaction_id: u32,
     pub balance: f64,
 }
 
 impl TransactionResponse {
     /// Конструктор ответа совершенной транзакции.
-    pub fn new(account_name: String, transaction_id: u32, balance: f64) -> Self {
+    pub fn new(account_id: u32, transaction_id: u32, balance: f64) -> Self {
         Self {
-            account_name,
+            account_id,
             transaction_id,
             balance,
         }
@@ -64,8 +64,8 @@ impl TransactionResponse {
 /// Структура для парсинга деталий перевода со счета на счет.
 #[derive(Clone, Serialize, Deserialize, ToSchema)]
 pub struct TransferRequest {
-    pub account_from: String,
-    pub account_to: String,
+    pub account_from: u32,
+    pub account_to: u32,
     pub transfer_value: f64,
 }
 

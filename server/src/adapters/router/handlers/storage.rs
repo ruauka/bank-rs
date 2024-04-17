@@ -20,7 +20,7 @@ responses(
 /// получение всех транзакций бд в разбивке по счетам
 pub async fn history(
     State(state): State<StorageState>,
-) -> Result<Json<HashMap<String, Account>>, AppError> {
+) -> Result<Json<HashMap<u32, Account>>, AppError> {
     usecases::storage::history(state).map(Json)
 }
 

@@ -15,12 +15,12 @@ use std::sync::{Arc, RwLock};
 
 /// Создание нового счета.
 pub fn new_account<S: Storages>(storage: Arc<RwLock<S>>) -> TransactionResponse {
-    // получение названия последнего счета
-    let last_name: String = storage.write().unwrap().db().get_last_account_name();
+    // // получение названия последнего счета
+    // let last_name: String = storage.write().unwrap().db().get_last_account_name();
 
     // создание нового счета
-    let mut account: Account = Account::new(last_name);
-    let acc_name: String = account.name.clone();
+    let mut account: Account = Account::new();
+    // let acc_id: u32 = account.id.clone();
 
     // создание транзакиции о создании счета
     let tx_new: Transaction = Transaction::new(
@@ -33,9 +33,9 @@ pub fn new_account<S: Storages>(storage: Arc<RwLock<S>>) -> TransactionResponse 
     // добавление транзакции в список транзакций счета
     account.transactions.push(tx_new);
     // добавление счета в db
-    storage.write().unwrap().db().create_account(account);
+    let acc_id: u32 = storage.write().unwrap().db().create_account(account);
     // body
-    let tx: TransactionResponse = TransactionResponse::new(acc_name, 0_u32, 0_f64);
+    let tx: TransactionResponse = TransactionResponse::new(acc_id, 0_u32, 0_f64);
     // backup
     storage.write().unwrap().db().backup_store();
 
@@ -46,12 +46,12 @@ pub fn new_account<S: Storages>(storage: Arc<RwLock<S>>) -> TransactionResponse 
 pub fn change_acc_balance<S: Storages>(
     storage: &Arc<RwLock<S>>,
     trans_value: f64,
-    account_name: &String,
+    account_id: u32,
     operation: Operation,
 ) -> Result<TransactionResponse, AppError> {
     // проверка наличия счета
-    if !storage.write().unwrap().db().check_key(account_name) {
-        return Err(AccountNotExists(account_name.to_string()));
+    if !storage.write().unwrap().db().check_key(account_id) {
+        return Err(AccountNotExists(account_id.to_string()));
     }
     // проверка на наличие изменение баланса на 0 или меньше
     if trans_value <= 0_f64 {
@@ -60,7 +60,7 @@ pub fn change_acc_balance<S: Storages>(
 
     let mut binding = storage.write().unwrap();
     // получение счета
-    let cur_acc: &mut Account = binding.db().get_mut_account(account_name);
+    let cur_acc: &mut Account = binding.db().get_mut_account(account_id);
     // проверка на снятие или перевод больше, чем есть на счете
     if matches!(operation, Withdraw | TransferDecrease) && cur_acc.balance < trans_value {
         return Err(Overdraft);
@@ -90,8 +90,7 @@ pub fn change_acc_balance<S: Storages>(
     // обновление текущего баланса счета
     cur_acc.balance = new_balance;
     // body
-    let tx: TransactionResponse =
-        TransactionResponse::new(account_name.to_string(), new_tx_id, cur_acc.balance);
+    let tx: TransactionResponse = TransactionResponse::new(account_id, new_tx_id, cur_acc.balance);
     // backup
     binding.db().backup_store();
 
@@ -118,18 +117,18 @@ pub fn transfer<S: Storages>(
         .write()
         .unwrap()
         .db()
-        .check_key(&payload.account_from)
+        .check_key(payload.account_from)
     {
-        return Err(AccountNotExists(payload.account_from));
+        return Err(AccountNotExists(payload.account_from.to_string()));
     }
     // проверка наличия счета
-    if !storage.write().unwrap().db().check_key(&payload.account_to) {
-        return Err(AccountNotExists(payload.account_to));
+    if !storage.write().unwrap().db().check_key(payload.account_to) {
+        return Err(AccountNotExists(payload.account_to.to_string()));
     }
     // списание со счета отправителя
-    change_acc_balance(&storage, tx_value, &payload.account_from, TransferDecrease)?;
+    change_acc_balance(&storage, tx_value, payload.account_from, TransferDecrease)?;
     // пополнение счета получателя
-    change_acc_balance(&storage, tx_value, &payload.account_to, TransferIncrease)?;
+    change_acc_balance(&storage, tx_value, payload.account_to, TransferIncrease)?;
 
     // body
     let tx: TransferResponse = TransferResponse::new(p);
@@ -142,15 +141,15 @@ pub fn transfer<S: Storages>(
 /// Баланса счета.
 pub fn balance<S: Storages>(
     storage: Arc<RwLock<S>>,
-    account_name: String,
+    account_id: u32,
 ) -> Result<BalanceResponse, AppError> {
     // проверка наличия счета
-    if !storage.write().unwrap().db().check_key(&account_name) {
-        return Err(AccountNotExists(account_name));
+    if !storage.write().unwrap().db().check_key(account_id) {
+        return Err(AccountNotExists(account_id.to_string()));
     }
     let mut binding = storage.write().unwrap();
     // получение счета
-    let account: &Account = binding.db().get_account(&account_name);
+    let account: &Account = binding.db().get_account(account_id);
     // body
     let balance: BalanceResponse = BalanceResponse::new(account.balance);
 
@@ -158,18 +157,15 @@ pub fn balance<S: Storages>(
 }
 
 /// Получение всех транзакций счета.
-pub fn account<S: Storages>(
-    storage: Arc<RwLock<S>>,
-    account_name: String,
-) -> Result<Account, AppError> {
+pub fn account<S: Storages>(storage: Arc<RwLock<S>>, account_id: u32) -> Result<Account, AppError> {
     // проверка наличия счета
-    if !storage.write().unwrap().db().check_key(&account_name) {
-        return Err(AccountNotExists(account_name.to_string()));
+    if !storage.write().unwrap().db().check_key(account_id) {
+        return Err(AccountNotExists(account_id.to_string()));
     }
 
     let mut binding = storage.write().unwrap();
     // получение счета
-    let account: &Account = binding.db().get_account(&account_name);
+    let account: &Account = binding.db().get_account(account_id);
 
     Ok(account.clone())
 }

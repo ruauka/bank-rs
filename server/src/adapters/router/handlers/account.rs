@@ -20,9 +20,6 @@ responses(
 )
 )]
 /// Создание нового счета
-///
-/// Хендлер создания нового счета. Счета имееют имя: account_ и число. Пример: account_1.
-/// Имя счетов формируются автоматически. Имя первого счета: account_1.
 pub async fn new_account(State(state): State<StorageState>) -> Json<TransactionResponse> {
     Json(usecases::account::new_account(state))
 }
@@ -51,14 +48,14 @@ pub async fn replenish(
     let res: Result<Json<TransactionResponse>, AppError> = usecases::account::change_acc_balance(
         &state,
         payload.transaction_value.unwrap(),
-        &payload.account_name,
+        payload.account_id,
         Replenish,
     )
     .map(Json);
     // для себя, запомнить
     // map применяет функцию (экстактор Json в данном случае) к OK значению из change_acc_balance
 
-    Ok(res.unwrap())
+    res
 }
 
 #[utoipa::path(
@@ -85,7 +82,7 @@ pub async fn withdraw(
     usecases::account::change_acc_balance(
         &state,
         payload.transaction_value.unwrap(),
-        &payload.account_name,
+        payload.account_id,
         Withdraw,
     )
     .map(Json)
@@ -130,9 +127,9 @@ responses(
 /// Баланс счета
 pub async fn balance(
     State(state): State<StorageState>,
-    Path(account_name): Path<String>,
+    Path(account_id): Path<u32>,
 ) -> Result<Json<BalanceResponse>, AppError> {
-    usecases::account::balance(state, account_name).map(Json)
+    usecases::account::balance(state, account_id).map(Json)
 }
 
 #[utoipa::path(
@@ -149,7 +146,7 @@ responses(
 /// Получение счета
 pub async fn account(
     State(state): State<StorageState>,
-    Path(account_name): Path<String>,
+    Path(account_id): Path<u32>,
 ) -> Result<Json<Account>, AppError> {
-    usecases::account::account(state, account_name).map(Json)
+    usecases::account::account(state, account_id).map(Json)
 }
