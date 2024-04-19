@@ -1,0 +1,21 @@
+[package]
+name = "server"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+thiserror = "1.0.58"
+serde_json = "1.0.114"
+axum = { version = "0.7.4", features = ["tracing", "multipart"] }
+tokio = { version = "1.0", features = ["full"] }
+serde = { version = "1.0.197", features = ["derive"] }
+tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json"] }
+tracing = "0.1"
+tower-http = { version = "0.5", features = ["timeout", "trace"] }
+utoipa = { version = "4", features = ["axum_extras"] }
+utoipa-swagger-ui = { version = "6", features = ["axum"] }
+anyhow = "1.0.81"
+tower = { version = "0.4", features = ["util"] }
+clap = { version = "4.5.4", features = ["derive"] }
