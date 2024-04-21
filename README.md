@@ -12,25 +12,25 @@ Service allows work with:
 ## Content
 
 - [Specifications](#specifications)
-- [Client](#client)
 - [Server](#server)
     - [Start](#start)
     - [Swagger](#swagger)
+    - [Storage](#storage)
     - [Replication](#replication)
     - [CI](#ci)
-    - [Operations](#operations)
-        - [Account](#account)
-            - [Create](#create)
-            - [Replenish](#replenish)
-            - [Withdraw](#withdraw)
-            - [Transfer](#transfer)
-            - [Balance](#balance)
-            - [State](#state)
-        - [Transaction](#transaction)
-            - [Get](#get)
-        - [Storage](#storage)
-            - [History](#history)
-            - [Backup](#backup)
+- [Client](#client)
+    - [Account](#account)
+        - [Create](#create)
+        - [Replenish](#replenish)
+        - [Withdraw](#withdraw)
+        - [Transfer](#transfer)
+        - [Balance](#balance)
+        - [State](#state)
+    - [Transaction](#transaction)
+        - [Get](#get)
+    - [Storage](#storage)
+        - [History](#history)
+        - [Backup](#backup)
 
 ### Specifications
 
@@ -96,11 +96,7 @@ Service allows work with:
 - За все операции взымается комиссия и добавляется на специальный счёт.
 - Банк хранит данные в базе данных (Redis, SQLite, ...).
 
-### Client
-
-in progress...
-
-### Server
+## Server
 
 `Axum` webserver is used - https://github.com/tokio-rs/axum
 
@@ -109,10 +105,11 @@ in progress...
 To start service run in terminal:
 
 ```bash
-make run-server
+make server
 ```
 
 To customize server host and port use cli keys. Example:
+
 ```bash
 cargo run -p server -- --host 0.0.0.0 --port 8000
 ```
@@ -129,11 +126,16 @@ Swagger is available at link - http://localhost:8080/swagger/
     <img src="server/assets/swagger.png" width="700">
 </p>
 
+### Storage
+
+Database is implemented as a `multithreading in-memory cache`.
+
 ### Replication
 
 After starting the service, a local folder is created for replication along the `server/backup` path.
 
-After first successful transaction creates file `server/backup/backup.json` and all successful transaction are replicated
+After first successful transaction creates file `server/backup/backup.json` and all successful transaction are
+replicated
 in it.
 
 Db replicates in file `after every successful transaction`.
@@ -142,9 +144,13 @@ Db replicates in file `after every successful transaction`.
 
 in progress...
 
-### Operations
+## Client
 
-For more information about service handlers look at `swagger`.
+Creating a client instance:
+
+```rust
+let invoker: HttpInvoker = HttpInvoker::new();
+```
 
 ### Account
 
@@ -189,8 +195,6 @@ Operations with transactions.
 Get account `transaction`.
 
 ### Storage
-
-Database is implemented as a `multithreaded in-memory cache`.
 
 ### History
 
