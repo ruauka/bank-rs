@@ -1,0 +1,16 @@
+{
+    "1": {
+        "balance": 0.0,
+        "id": 0,
+        "status": "Opened",
+        "transactions": [
+            {
+                "current": 0.0,
+                "delta": 0.0,
+                "id": 0,
+                "operation": "Registration",
+                "previous": 0.0
+            }
+        ]
+    }
+}
