@@ -15,12 +15,7 @@ use reqwest::Client;
 
 #[tokio::main]
 async fn main() {
-    let client: Client = Client::builder().build().unwrap();
-    let account = AccountInvoke::new(client.clone());
-    let transaction = TransactionInvoke::new(client.clone());
-    let storage = StorageInvoke::new(client.clone());
-
-    let invoker = HttpInvoker::new(account, transaction, storage);
+    let invoker = HttpInvoker::new();
 
     let acc1 = invoker.account.create().await.unwrap();
     println!("{:#?}", acc1);

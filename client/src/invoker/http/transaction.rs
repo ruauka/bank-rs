@@ -10,12 +10,13 @@ pub struct TransactionInvoke {
 
 impl TransactionInvoke {
     /// Конструктор.
-    pub fn new(client: Client) -> impl TransactionInvoker {
+    pub fn new(client: Client) -> Self {
         Self { client }
     }
 }
 
 /// Интерфейс работы с транзакциями.
+#[trait_variant::make(IntFactory: Send)]
 pub trait TransactionInvoker {
     /// Получение транзакции по ID.
     async fn transaction(

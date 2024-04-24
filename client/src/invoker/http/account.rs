@@ -14,12 +14,13 @@ pub struct AccountInvoke {
 
 impl AccountInvoke {
     /// Конструктор.
-    pub fn new(client: Client) -> impl AccountInvoker {
+    pub fn new(client: Client) -> Self {
         Self { client }
     }
 }
 
 /// Интерфейс работы со счетами.
+#[trait_variant::make(IntFactory: Send)]
 pub trait AccountInvoker {
     /// Создание счета.
     async fn create(&self) -> Result<TransactionResponse, Box<dyn std::error::Error>>;

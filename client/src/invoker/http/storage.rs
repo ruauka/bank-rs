@@ -11,12 +11,13 @@ pub struct StorageInvoke {
 
 impl StorageInvoke {
     /// Конструктор.
-    pub fn new(client: Client) -> impl StorageInvoker {
+    pub fn new(client: Client) -> Self {
         Self { client }
     }
 }
 
 /// Интерфейс работы с БД.
+#[trait_variant::make(IntFactory: Send)]
 pub trait StorageInvoker {
     /// Запрос всей БД (все счета и их транзакции).
     async fn history(&self) -> Result<HashMap<u32, Account>, Box<dyn std::error::Error>>;
