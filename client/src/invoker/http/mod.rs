@@ -7,9 +7,6 @@ use crate::invoker::http::storage::{StorageInvoke, StorageInvoker};
 use crate::invoker::http::transaction::{TransactionInvoke, TransactionInvoker};
 use reqwest::Client;
 
-/// URL сервера.
-const URL: &str = "http://localhost:8080";
-
 /// Общая структура объектов вызова хендлеров сервера.
 #[derive(Default)]
 pub struct HttpInvoker<A, T, S>

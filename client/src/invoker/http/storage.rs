@@ -1,10 +1,10 @@
 use crate::entities::Account;
-use crate::invoker::http::URL;
+use crate::invoker::URL;
 use reqwest::{Client, Response};
 use std::collections::HashMap;
 use std::path::Path;
 
-/// Структура объекта вызова для работы с БД>.
+/// Структура объекта вызова для работы с БД.
 pub struct StorageInvoke {
     client: Client,
 }

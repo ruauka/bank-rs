@@ -2,7 +2,6 @@
 name = "server"
 version = "0.1.0"
 edition = "2021"
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
@@ -19,3 +18,10 @@ utoipa-swagger-ui = { version = "6", features = ["axum"] }
 anyhow = "1.0.81"
 tower = { version = "0.4", features = ["util"] }
 clap = { version = "4.5.4", features = ["derive"] }
+tonic = "0.11"
+tonic-reflection = "0.11"
+prost = "0.12.3"
+tonic-web = "0.11"
+
+[build-dependencies]
+tonic-build = "0.11"

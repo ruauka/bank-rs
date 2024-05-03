@@ -21,7 +21,7 @@ responses(
 pub async fn history(
     State(state): State<StorageState>,
 ) -> Result<Json<HashMap<u32, Account>>, AppError> {
-    usecases::storage::history(state).map(Json)
+    usecases::storage::history(&state).map(Json)
 }
 
 #[utoipa::path(
@@ -42,7 +42,7 @@ responses(
 pub async fn backup(
     State(state): State<StorageState>,
 ) -> Result<Json<HashMap<String, String>>, AppError> {
-    usecases::storage::backup(state)?;
+    usecases::storage::backup(&state)?;
     // 200
     Ok(Json(HashMap::from([(
         "info".to_string(),

@@ -99,7 +99,7 @@ pub fn change_acc_balance<S: Storages>(
 
 /// Перевод со счета на счет.
 pub fn transfer<S: Storages>(
-    storage: Arc<RwLock<S>>,
+    storage: &Arc<RwLock<S>>,
     payload: TransferRequest,
 ) -> Result<TransferResponse, AppError> {
     let p = payload.clone();
@@ -126,9 +126,9 @@ pub fn transfer<S: Storages>(
         return Err(AccountNotExists(payload.account_to.to_string()));
     }
     // списание со счета отправителя
-    change_acc_balance(&storage, tx_value, payload.account_from, TransferDecrease)?;
+    change_acc_balance(storage, tx_value, payload.account_from, TransferDecrease)?;
     // пополнение счета получателя
-    change_acc_balance(&storage, tx_value, payload.account_to, TransferIncrease)?;
+    change_acc_balance(storage, tx_value, payload.account_to, TransferIncrease)?;
 
     // body
     let tx: TransferResponse = TransferResponse::new(p);
@@ -140,7 +140,7 @@ pub fn transfer<S: Storages>(
 
 /// Баланса счета.
 pub fn balance<S: Storages>(
-    storage: Arc<RwLock<S>>,
+    storage: &Arc<RwLock<S>>,
     account_id: u32,
 ) -> Result<BalanceResponse, AppError> {
     // проверка наличия счета
@@ -157,7 +157,10 @@ pub fn balance<S: Storages>(
 }
 
 /// Получение всех транзакций счета.
-pub fn account<S: Storages>(storage: Arc<RwLock<S>>, account_id: u32) -> Result<Account, AppError> {
+pub fn account<S: Storages>(
+    storage: &Arc<RwLock<S>>,
+    account_id: u32,
+) -> Result<Account, AppError> {
     // проверка наличия счета
     if !storage.write().unwrap().db().check_key(account_id) {
         return Err(AccountNotExists(account_id.to_string()));

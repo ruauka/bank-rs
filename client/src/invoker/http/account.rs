@@ -1,5 +1,5 @@
 use crate::entities::Account;
-use crate::invoker::http::URL;
+use crate::invoker::URL;
 use crate::schemas::{
     request::{ChangeBalanceRequest, TransferRequest},
     response::{BalanceResponse, TransactionResponse, TransferResponse},

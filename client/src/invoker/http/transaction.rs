@@ -1,5 +1,5 @@
 use crate::entities::Transaction;
-use crate::invoker::http::URL;
+use crate::invoker::URL;
 use reqwest::{Client, Response};
 use std::path::Path;
 
