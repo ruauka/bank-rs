@@ -1,15 +1,14 @@
 use serde::Deserialize;
 
 /// Статусы счета.
-#[derive(Debug, Default, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub enum Status {
-    #[default]
     Opened,
     Closed,
 }
 
 /// Структура транзакции.
-#[derive(Debug, Default, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Transaction {
     pub id: u32,
     pub operation: String,
@@ -19,7 +18,7 @@ pub struct Transaction {
 }
 
 /// Структура счета.
-#[derive(Debug, Default, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Account {
     pub id: u32,
     pub status: Status,

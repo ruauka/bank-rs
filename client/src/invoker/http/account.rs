@@ -20,7 +20,7 @@ impl AccountInvoke {
 }
 
 /// Интерфейс работы со счетами.
-#[trait_variant::make(IntFactory: Send)]
+#[trait_variant::make(Send)]
 pub trait AccountInvoker {
     /// Создание счета.
     async fn create(&self) -> Result<TransactionResponse, Box<dyn std::error::Error>>;

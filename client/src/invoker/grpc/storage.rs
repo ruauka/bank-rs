@@ -16,7 +16,7 @@ impl StorageInvoke {
 }
 
 /// Интерфейс работы с БД.
-#[trait_variant::make(IntFactory: Send)]
+#[trait_variant::make(Send)]
 pub trait StorageInvoker {
     /// Запрос всей БД (все счета и их транзакции).
     async fn history(

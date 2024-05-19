@@ -16,7 +16,7 @@ impl TransactionInvoke {
 }
 
 /// Интерфейс работы с транзакциями.
-#[trait_variant::make(IntFactory: Send)]
+#[trait_variant::make(Send)]
 pub trait TransactionInvoker {
     /// Получение транзакции по ID.
     async fn transaction(
