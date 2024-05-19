@@ -125,8 +125,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let account = invoker.account.create().await?;
     println!("Response: {:?}", account.get_ref());
     // поплнение счета
-    let res = invoker.account.replenish(account.get_ref().account_id, 100_f64).await?;
-    println!("Response: {:?}", res.get_ref());
+    let replenish_tx = invoker.account.replenish(account.get_ref().account_id, 100_f64).await?;
+    println!("Response: {:?}", replenish_tx.get_ref());
     
     Ok(())
 }

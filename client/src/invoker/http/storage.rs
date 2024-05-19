@@ -31,17 +31,17 @@ impl StorageInvoker for StorageInvoke {
         // путь
         let path: String = Path::new(URL).join("storage/history").display().to_string();
         // запрос
-        let res: Response = self.client.get(path).send().await?;
+        let resp: Response = self.client.get(path).send().await?;
         // парсинг ответа
-        Ok(res.json::<HashMap<u32, Account>>().await?)
+        Ok(resp.json::<HashMap<u32, Account>>().await?)
     }
 
     async fn backup(&self) -> Result<HashMap<String, String>, Box<dyn std::error::Error>> {
         // путь
         let path: String = Path::new(URL).join("storage/backup").display().to_string();
         // запрос
-        let res: Response = self.client.post(path).send().await?;
+        let resp: Response = self.client.post(path).send().await?;
         // парсинг ответа
-        Ok(res.json::<HashMap<String, String>>().await?)
+        Ok(resp.json::<HashMap<String, String>>().await?)
     }
 }

@@ -78,9 +78,9 @@ impl AccountInvoker for AccountInvoke {
             .display()
             .to_string();
         // запрос
-        let res: Response = self.client.post(path).json(&req).send().await?;
+        let resp: Response = self.client.post(path).json(&req).send().await?;
         // парсинг ответа
-        Ok(res.json::<TransactionResponse>().await?)
+        Ok(resp.json::<TransactionResponse>().await?)
     }
 
     async fn withdraw(
@@ -96,9 +96,9 @@ impl AccountInvoker for AccountInvoke {
             .display()
             .to_string();
         // запрос
-        let res: Response = self.client.post(path).json(&req).send().await?;
+        let resp: Response = self.client.post(path).json(&req).send().await?;
         // парсинг ответа
-        Ok(res.json::<TransactionResponse>().await?)
+        Ok(resp.json::<TransactionResponse>().await?)
     }
 
     async fn transfer(
@@ -115,9 +115,9 @@ impl AccountInvoker for AccountInvoke {
             .display()
             .to_string();
         // запрос
-        let res: Response = self.client.post(path).json(&req).send().await?;
+        let resp: Response = self.client.post(path).json(&req).send().await?;
         // парсинг ответа
-        Ok(res.json::<TransferResponse>().await?)
+        Ok(resp.json::<TransferResponse>().await?)
     }
 
     async fn balance(
@@ -131,9 +131,9 @@ impl AccountInvoker for AccountInvoke {
             .display()
             .to_string();
         // запрос
-        let res: Response = self.client.get(path).send().await?;
+        let resp: Response = self.client.get(path).send().await?;
         // парсинг ответа
-        Ok(res.json::<BalanceResponse>().await?)
+        Ok(resp.json::<BalanceResponse>().await?)
     }
 
     async fn account(&self, account_id: u32) -> Result<Account, Box<dyn std::error::Error>> {
@@ -144,8 +144,8 @@ impl AccountInvoker for AccountInvoke {
             .display()
             .to_string();
         // запрос
-        let res: Response = self.client.get(path).send().await?;
+        let resp: Response = self.client.get(path).send().await?;
         // парсинг ответа
-        Ok(res.json::<Account>().await?)
+        Ok(resp.json::<Account>().await?)
     }
 }

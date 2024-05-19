@@ -1,5 +1,5 @@
-use crate::adapters::router::grpc::proto::bank_server::Bank;
-use crate::adapters::storage::StorageState;
+use crate::adapter::router::grpc::proto::bank_server::Bank;
+use crate::adapter::storage::StorageState;
 use crate::domain::entities::account::{Account, BalanceResponse};
 use crate::domain::entities::transaction::Operation::{Replenish, Withdraw};
 use crate::domain::entities::transaction::{

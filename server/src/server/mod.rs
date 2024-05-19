@@ -1,10 +1,10 @@
 mod cli;
 
-use crate::adapters::router::grpc::proto::bank_server::BankServer;
-use crate::adapters::router::grpc::BankService;
-use crate::adapters::router::http::router;
-use crate::adapters::storage::cache::PATH;
-use crate::adapters::storage::{Storage, StorageState};
+use crate::adapter::router::grpc::proto::bank_server::BankServer;
+use crate::adapter::router::grpc::BankService;
+use crate::adapter::router::http::router;
+use crate::adapter::storage::cache::PATH;
+use crate::adapter::storage::{Storage, StorageState};
 use crate::server::cli::Cli;
 use axum::Router;
 use clap::Parser;

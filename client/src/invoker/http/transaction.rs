@@ -40,8 +40,8 @@ impl TransactionInvoker for TransactionInvoke {
             .display()
             .to_string();
         // запрос
-        let res: Response = self.client.get(path).send().await?;
+        let resp: Response = self.client.get(path).send().await?;
         // парсинг ответа
-        Ok(res.json::<Transaction>().await?)
+        Ok(resp.json::<Transaction>().await?)
     }
 }

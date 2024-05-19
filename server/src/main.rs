@@ -4,7 +4,7 @@
 // #![allow(unused_assignments)]
 // #![allow(unused_mut)]
 
-mod adapters;
+mod adapter;
 mod domain;
 mod server;
 

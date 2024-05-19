@@ -1,4 +1,4 @@
-use crate::adapters::storage::StorageState;
+use crate::adapter::storage::StorageState;
 use crate::domain::entities::transaction::Transaction;
 use crate::domain::errors::AppError::{AccountNotExists, TransactionNotExists};
 use crate::domain::errors::{AppError, Result};

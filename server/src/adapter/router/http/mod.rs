@@ -1,12 +1,12 @@
 pub mod handlers;
 
-use crate::adapters::router::http::handlers::account::{
+use crate::adapter::router::http::handlers::account::{
     account, balance, new_account, replenish, transfer, withdraw,
 };
-use crate::adapters::router::http::handlers::storage::{backup, history};
-use crate::adapters::router::http::handlers::transaction::transaction;
-use crate::adapters::router::http::handlers::{account, storage, transaction};
-use crate::adapters::storage::Storage;
+use crate::adapter::router::http::handlers::storage::{backup, history};
+use crate::adapter::router::http::handlers::transaction::transaction;
+use crate::adapter::router::http::handlers::{account, storage, transaction};
+use crate::adapter::storage::Storage;
 use crate::domain::entities::account::{Account, BalanceResponse, Status};
 use crate::domain::entities::transaction::{
     Operation, Transaction, TransactionRequest, TransactionResponse,

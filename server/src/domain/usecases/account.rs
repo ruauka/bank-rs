@@ -1,5 +1,5 @@
-use crate::adapters::storage::cache::Cache;
-use crate::adapters::storage::Storages;
+use crate::adapter::storage::cache::Cache;
+use crate::adapter::storage::Storages;
 use crate::domain::entities::account::{Account, BalanceResponse};
 use crate::domain::entities::transaction::Operation::{
     Replenish, TransferDecrease, TransferIncrease, Withdraw,

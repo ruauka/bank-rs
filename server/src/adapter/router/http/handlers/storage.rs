@@ -1,4 +1,4 @@
-use crate::adapters::storage::StorageState;
+use crate::adapter::storage::StorageState;
 use crate::domain::entities::account::Account;
 use crate::domain::errors::AppError::{
     BackupLoadFile, EmptyBackupFile, EmptyDb, InvalidBackupFile,
