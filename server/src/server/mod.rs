@@ -54,7 +54,7 @@ async fn grpc_start(
     // запуск сервиса
     Server::builder()
         .add_service(BankServer::new(app))
-        .serve(address.parse()?)
+        .serve_with_shutdown(address.parse()?, shutdown_signal())
         .await?;
 
     Ok(())

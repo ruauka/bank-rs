@@ -123,13 +123,13 @@ async fn grpc_call(
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // что то одно должно быть закомментированно
 
-    // // пример http вызовов
-    // let invoker = HttpInvoker::new();
-    // http_call(invoker).await?;
+    // пример http вызовов
+    let invoker = HttpInvoker::new();
+    http_call(invoker).await?;
 
-    //  пример gRPC вызовов
-    let invoker = GRPCInvoker::new().await;
-    grpc_call(invoker).await?;
+    // //  пример gRPC вызовов
+    // let invoker = GRPCInvoker::new().await;
+    // grpc_call(invoker).await?;
 
     Ok(())
 }
