@@ -1,0 +1,83 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+package bank;
+
+service Bank {
+    rpc NewAccount(google.protobuf.Empty) returns (TransactionResponse);
+    rpc Replenish(TransactionRequest) returns (TransactionResponse);
+    rpc Withdraw(TransactionRequest) returns (TransactionResponse);
+    rpc Transfer(TransferRequest) returns (TransferResponse);
+    rpc Balance(AccountId) returns (BalanceResponse);
+    rpc Account(AccountId) returns (AccountResponse);
+    rpc GetTransaction(Trans) returns (Transaction);
+    rpc History(google.protobuf.Empty) returns (HistoryResponse);
+    rpc Backup(google.protobuf.Empty) returns (google.protobuf.Empty);
+}
+
+message TransactionRequest {
+    uint32 account_id = 1;
+    float transaction_value = 2;
+}
+
+message TransactionResponse {
+    uint32 account_id = 1;
+    uint32 transaction_id = 2;
+    float balance = 3;
+}
+
+message TransferRequest {
+    uint32 account_from = 1;
+    uint32 account_to = 2;
+    float transfer_value = 3;
+}
+
+message TransferResponse {
+    string info = 1;
+    TransferRequest details = 2;
+}
+
+message AccountId {
+    uint32 account_id = 1;
+}
+
+message BalanceResponse {
+    float balance = 1;
+}
+
+message AccountResponse {
+    uint32 id = 1;
+    Status status = 2;
+    float balance = 3;
+    repeated Transaction transaction = 4;
+}
+
+enum Status {
+    Opened = 0;
+    Closed = 1;
+}
+
+message Transaction {
+    uint32 id = 1;
+    Operation operation = 2;
+    float previous = 3;
+    float delta = 4;
+    float current = 5;
+}
+
+enum Operation {
+    Registration = 0;
+    Replenish = 1;
+    Withdraw = 2;
+    TransferIncrease = 3;
+    TransferDecrease = 4;
+}
+
+message Trans {
+    uint32 account_id = 1;
+    uint32 transaction_id = 2;
+}
+
+message HistoryResponse {
+    map<uint32, AccountResponse> response = 1;
+}

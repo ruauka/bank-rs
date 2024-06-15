@@ -1,4 +1,4 @@
-use crate::adapters::storage::StorageState;
+use crate::adapter::storage::StorageState;
 use crate::domain::entities::transaction::Transaction;
 use crate::domain::errors::AppError::{AccountNotExists, TransactionNotExists};
 use crate::domain::errors::{AppError, Result};
@@ -26,5 +26,5 @@ pub async fn transaction(
     State(state): State<StorageState>,
     Path((account_id, transaction_id)): Path<(u32, u32)>,
 ) -> Result<Json<Transaction>, AppError> {
-    usecases::transaction::transaction(state, account_id, transaction_id).map(Json)
+    usecases::transaction::transaction(&state, account_id, transaction_id).map(Json)
 }

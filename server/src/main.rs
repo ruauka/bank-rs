@@ -4,13 +4,13 @@
 // #![allow(unused_assignments)]
 // #![allow(unused_mut)]
 
-mod adapters;
+mod adapter;
 mod domain;
 mod server;
 
 use crate::server::execute;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     execute().await
 }

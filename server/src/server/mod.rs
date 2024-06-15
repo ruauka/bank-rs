@@ -1,37 +1,73 @@
 mod cli;
 
-use crate::adapters::router::router;
-use crate::adapters::storage::cache::PATH;
-use crate::adapters::storage::{Storage, StorageState};
+use crate::adapter::router::grpc::proto::bank_server::BankServer;
+use crate::adapter::router::grpc::BankService;
+use crate::adapter::router::http::router;
+use crate::adapter::storage::cache::PATH;
+use crate::adapter::storage::{Storage, StorageState};
 use crate::server::cli::Cli;
 use axum::Router;
 use clap::Parser;
 use std::fs;
 use std::sync::{Arc, RwLock};
 use tokio::signal;
+use tonic::transport::Server;
 use tracing::info;
 
 /// Основная функция. Инициализация и запуск сервиса.
-pub async fn execute() {
+pub async fn execute() -> Result<(), Box<dyn std::error::Error>> {
     // cli-конфиг
     let cfg: Cli = Cli::parse();
-    // создание 'state' объекта
-    let shared_state: Arc<RwLock<Storage>> = StorageState::default();
-    // создание роутера и регистрация хендлеров и swagger
-    let router: Router = router(shared_state).await;
-    // создание папки для backup.json
-    fs::create_dir_all(PATH).expect("error occurred while creating backup folder");
     // включение трейсинга
     tracing_subscriber::fmt()
         .with_target(false)
         .compact()
         .init();
+    // создание 'state' объекта
+    let shared_state: Arc<RwLock<Storage>> = StorageState::default();
+    // создание папки для backup.json
+    fs::create_dir_all(PATH).expect("error occurred while creating backup folder");
     // хост и порт
     let address: String = format!("{}:{}", cfg.host, cfg.port);
+    // старт сервиса http/gRPC
+    match cfg.protocol.as_str() {
+        "grpc" => grpc_start(shared_state, address).await,
+        "http" => {
+            http_start(shared_state, address).await;
+            Ok(())
+        }
+        _ => Ok(()),
+    }
+}
+
+/// Страт gRPC сервера.
+async fn grpc_start(
+    state: StorageState,
+    address: String,
+) -> Result<(), Box<dyn std::error::Error>> {
+    // создание приложения
+    let app = BankService { state };
+    info!(
+        "🚀 GRPC server started successfully. Listening on {}...",
+        address
+    );
+    // запуск сервиса
+    Server::builder()
+        .add_service(BankServer::new(app))
+        .serve_with_shutdown(address.parse()?, shutdown_signal())
+        .await?;
+
+    Ok(())
+}
+
+/// Страт Http сервера.
+async fn http_start(state: StorageState, address: String) {
+    // создание роутера и регистрация хендлеров и swagger
+    let router: Router = router(state).await;
     // tcp-движок
     let listener = tokio::net::TcpListener::bind(address).await.unwrap();
     info!(
-        "🚀 Server started successfully. Listening on {}...",
+        "🚀 Http server started successfully. Listening on {}...",
         listener.local_addr().unwrap()
     );
     // запуск сервиса с graceful shutdown

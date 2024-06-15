@@ -11,14 +11,18 @@ Service allows work with:
 
 ## Content
 
-- [Specifications](#specifications)
+- [Specification](#specification)
+- [Example](#example)
 - [Server](#server)
     - [Start](#start)
+        - [Http](#http)
+        - [gPRC](#grpc)
     - [Swagger](#swagger)
     - [Storage](#storage)
     - [Replication](#replication)
     - [CI](#ci)
 - [Client](#client)
+    - [Protocol](#Protocol)
     - [Account](#account)
         - [Create](#create)
         - [Replenish](#replenish)
@@ -32,7 +36,7 @@ Service allows work with:
         - [History](#history)
         - [Backup](#backup)
 
-### Specifications
+## Specification
 
 Реализовать библиотеку предоставляющую базовый банковский функционал:
 
@@ -96,27 +100,71 @@ Service allows work with:
 - За все операции взымается комиссия и добавляется на специальный счёт.
 - Банк хранит данные в базе данных (Redis, SQLite, ...).
 
+## Example
+Example of usage
+
+```rust
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /* пример http вызова */
+    let invoker = HttpInvoker::new();
+    // создание счета 
+    let account = invoker.account.create().await.unwrap();
+    println!("{:#?}", account);
+    // поплнение счета
+    let replenish_tx = invoker
+        .account
+        .replenish(account.account_id, 100_f64)
+        .await
+        .unwrap();
+    println!("{:#?}", replenish_tx);
+
+    /* пример gPRC вызова */
+    let invoker = GRPCInvoker::new().await;
+    // создание счета
+    let account = invoker.account.create().await?;
+    println!("Response: {:?}", account.get_ref());
+    // поплнение счета
+    let replenish_tx = invoker.account.replenish(account.get_ref().account_id, 100_f64).await?;
+    println!("Response: {:?}", replenish_tx.get_ref());
+    
+    Ok(())
+}
+```
+
 ## Server
 
-`Axum` webserver is used - https://github.com/tokio-rs/axum
+`Axum` - `http` webserver - https://github.com/tokio-rs/axum
 
-### Start
+`Tonic` - `gRPC` webserver - https://github.com/hyperium/tonic
 
-To start service run in terminal:
+## Start
+
+### Http
+
+To start http-service run in terminal:
 
 ```bash
-make server
+make http-server
 ```
 
 To customize server host and port use cli keys. Example:
 
 ```bash
-cargo run -p server -- --host 0.0.0.0 --port 8000
+cargo run -p server -- --host 0.0.0.0 --port 8000 --protocol http
 ```
 
 Default values: `127.0.0.1:8080`
 
 Server stops with `graceful shutdown`.
+
+### gRPC
+
+To start gRPC-service run in terminal:
+
+```bash
+make grpc-server
+```
 
 ### Swagger
 
@@ -146,11 +194,21 @@ in progress...
 
 ## Client
 
-Creating a client instance:
+### Protocol
+
+Creating a `Http` client instance:
 
 ```rust
 let invoker: HttpInvoker = HttpInvoker::new();
 ```
+
+Creating a `gPRC` client instance:
+
+```rust
+let invoker = GRPCInvoker::new().await;
+```
+
+For more information, see the `example`
 
 ### Account
 

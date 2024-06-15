@@ -1,6 +1,6 @@
 pub mod cache;
 
-use crate::adapters::storage::cache::{Cache, CacheImpl};
+use crate::adapter::storage::cache::{Cache, CacheImpl};
 use std::sync::{Arc, RwLock};
 
 /// Тип 'state' сервиса.

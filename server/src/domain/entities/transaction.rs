@@ -39,7 +39,7 @@ impl Transaction {
 #[derive(Deserialize, ToSchema)]
 pub struct TransactionRequest {
     pub account_id: u32,
-    pub transaction_value: Option<f64>,
+    pub transaction_value: f64,
 }
 
 /// Структура ответа совершенной транзакции.

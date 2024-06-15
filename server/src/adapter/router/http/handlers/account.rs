@@ -1,4 +1,4 @@
-use crate::adapters::storage::StorageState;
+use crate::adapter::storage::StorageState;
 use crate::domain::entities::account::{Account, BalanceResponse};
 use crate::domain::entities::transaction::{
     Operation::{Replenish, Withdraw},
@@ -47,7 +47,7 @@ pub async fn replenish(
 ) -> Result<Json<TransactionResponse>, AppError> {
     let res: Result<Json<TransactionResponse>, AppError> = usecases::account::change_acc_balance(
         &state,
-        payload.transaction_value.unwrap(),
+        payload.transaction_value,
         payload.account_id,
         Replenish,
     )
@@ -81,7 +81,7 @@ pub async fn withdraw(
 ) -> Result<Json<TransactionResponse>, AppError> {
     usecases::account::change_acc_balance(
         &state,
-        payload.transaction_value.unwrap(),
+        payload.transaction_value,
         payload.account_id,
         Withdraw,
     )
@@ -110,7 +110,7 @@ pub async fn transfer(
     State(state): State<StorageState>,
     Json(payload): Json<TransferRequest>,
 ) -> Result<Json<TransferResponse>, AppError> {
-    usecases::account::transfer(state, payload).map(Json)
+    usecases::account::transfer(&state, payload).map(Json)
 }
 
 #[utoipa::path(
@@ -129,7 +129,7 @@ pub async fn balance(
     State(state): State<StorageState>,
     Path(account_id): Path<u32>,
 ) -> Result<Json<BalanceResponse>, AppError> {
-    usecases::account::balance(state, account_id).map(Json)
+    usecases::account::balance(&state, account_id).map(Json)
 }
 
 #[utoipa::path(
@@ -148,5 +148,5 @@ pub async fn account(
     State(state): State<StorageState>,
     Path(account_id): Path<u32>,
 ) -> Result<Json<Account>, AppError> {
-    usecases::account::account(state, account_id).map(Json)
+    usecases::account::account(&state, account_id).map(Json)
 }

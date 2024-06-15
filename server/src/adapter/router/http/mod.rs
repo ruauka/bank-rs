@@ -1,26 +1,26 @@
 pub mod handlers;
+mod middleware;
 
-use crate::adapters::router::handlers::account::{
+use crate::adapter::router::http::handlers::account::{
     account, balance, new_account, replenish, transfer, withdraw,
 };
-use crate::adapters::router::handlers::storage::{backup, history};
-use crate::adapters::router::handlers::transaction::transaction;
-use crate::adapters::router::handlers::{account, storage, transaction};
-use crate::adapters::storage::Storage;
+use crate::adapter::router::http::handlers::storage::{backup, history};
+use crate::adapter::router::http::handlers::transaction::transaction;
+use crate::adapter::router::http::handlers::{account, storage, transaction};
+use crate::adapter::router::http::middleware::middleware;
+use crate::adapter::storage::Storage;
 use crate::domain::entities::account::{Account, BalanceResponse, Status};
 use crate::domain::entities::transaction::{
     Operation, Transaction, TransactionRequest, TransactionResponse,
 };
 use crate::domain::entities::transaction::{TransferRequest, TransferResponse};
 use crate::domain::errors::AppError;
-use axum::routing::{get, post};
 use axum::Router;
+use axum::{
+    middleware::{self as middle},
+    routing::{get, post},
+};
 use std::sync::{Arc, RwLock};
-use std::time::Duration;
-use tower_http::timeout::TimeoutLayer;
-use tower_http::trace;
-use tower_http::trace::TraceLayer;
-use tracing::Level;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -58,13 +58,15 @@ pub async fn router(shared_state: Arc<RwLock<Storage>>) -> Router {
         .nest("/storage", storage_registration(&shared_state))
         // swagger
         .merge(SwaggerUi::new("/swagger").url("/api-docs/openapi.json", ApiDoc::openapi()))
-        .layer((
-            TraceLayer::new_for_http()
-                .make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO))
-                .on_response(trace::DefaultOnResponse::new().level(Level::INFO)),
-            // Graceful shutdown
-            TimeoutLayer::new(Duration::from_secs(5)),
-        ))
+        // .layer((
+        //     TraceLayer::new_for_http()
+        //         .make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO))
+        //         .on_response(trace::DefaultOnResponse::new().level(Level::INFO)),
+        //     // Graceful shutdown
+        //     TimeoutLayer::new(Duration::from_secs(5)),
+        // ))
+        // кастомный middleware
+        .layer(middle::from_fn(middleware))
 }
 
 /// Регистрация хендлеров работы со счетом.

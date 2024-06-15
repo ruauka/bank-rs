@@ -1,5 +1,5 @@
-use crate::adapters::storage::cache::Cache;
-use crate::adapters::storage::Storages;
+use crate::adapter::storage::cache::Cache;
+use crate::adapter::storage::Storages;
 use crate::domain::entities::account::Account;
 use crate::domain::entities::transaction::Transaction;
 use crate::domain::errors::AppError;
@@ -8,7 +8,7 @@ use std::sync::{Arc, RwLock};
 
 /// Получение транзакции счета по id.
 pub fn transaction<S: Storages>(
-    storage: Arc<RwLock<S>>,
+    storage: &Arc<RwLock<S>>,
     account_id: u32,
     transaction_id: u32,
 ) -> Result<Transaction, AppError> {

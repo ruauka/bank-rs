@@ -10,4 +10,7 @@ pub struct Cli {
     // app port
     #[arg(long, default_value = "8080")]
     pub port: u16,
+    // app protocol
+    #[arg(long, default_value = "http")]
+    pub protocol: String,
 }
