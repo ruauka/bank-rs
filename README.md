@@ -1,3 +1,5 @@
+[![build](https://github.com/ruauka/bank-rs/actions/workflows/pipeline.yml/badge.svg)](https://github.com/ruauka/bank-rs/actions/workflows/pipeline.yml)
+
 # Banking service
 
 ## Overview
